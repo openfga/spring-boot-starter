@@ -62,7 +62,7 @@ public class FgaAutoConfigurationTests {
                 .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
                 .run((context) -> {
                     ClientConfiguration config = (ClientConfiguration) context.getBean("openFgaConfig");
-                    assertThat(config.getApiUrl(), is("https://fga-api-url"));
+                    assertThat(config.getApiUrl(), is("https://api.fga.example"));
                     assertThat(config.getAuthorizationModelId(), is("authorization model ID"));
                     assertThat(config.getStoreId(), is("store ID"));
                     assertThat(config.getCredentials().getClientCredentials().getClientId(), is("client ID"));
