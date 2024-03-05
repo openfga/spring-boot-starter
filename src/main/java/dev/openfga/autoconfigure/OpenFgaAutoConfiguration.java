@@ -1,6 +1,7 @@
 package dev.openfga.autoconfigure;
 
 import dev.openfga.sdk.api.client.OpenFgaClient;
+import dev.openfga.sdk.api.configuration.ApiToken;
 import dev.openfga.sdk.api.configuration.ClientConfiguration;
 import dev.openfga.sdk.api.configuration.ClientCredentials;
 import dev.openfga.sdk.api.configuration.Credentials;
@@ -27,18 +28,27 @@ public class OpenFgaAutoConfiguration {
     public ClientConfiguration openFgaConfig() {
         var credentials = new Credentials();
 
-        if (openFgaProperties.getFgaClientId() != null) {
-            credentials = new Credentials(new ClientCredentials()
-                    .apiAudience(openFgaProperties.getFgaApiAudience())
-                    .apiTokenIssuer(openFgaProperties.getFgaApiTokenIssuer())
-                    .clientId(openFgaProperties.getFgaClientId())
-                    .clientSecret(openFgaProperties.getFgaClientSecret()));
+        var credentialsProperties = openFgaProperties.getCredentials();
+
+        if (credentialsProperties != null) {
+            if (credentialsProperties.getApiToken() != null) {
+                credentials.setApiToken(new ApiToken(credentialsProperties.getApiToken()));
+            } else {
+                ClientCredentials clientCredentials = new ClientCredentials()
+                        .clientId(credentialsProperties.getClientId())
+                        .clientSecret(credentialsProperties.getClientSecret())
+                        .apiTokenIssuer(credentialsProperties.getApiTokenIssuer())
+                        .apiAudience(credentialsProperties.getApiAudience())
+                        .scopes(credentialsProperties.getScopes());
+
+                credentials.setClientCredentials(clientCredentials);
+            }
         }
 
         return new ClientConfiguration()
-                .apiUrl(openFgaProperties.getFgaApiUrl())
-                .storeId(openFgaProperties.getFgaStoreId())
-                .authorizationModelId(openFgaProperties.getFgaAuthorizationModelId())
+                .apiUrl(openFgaProperties.getApiUrl())
+                .storeId(openFgaProperties.getStoreId())
+                .authorizationModelId(openFgaProperties.getAuthorizationModelId())
                 .credentials(credentials);
     }
 

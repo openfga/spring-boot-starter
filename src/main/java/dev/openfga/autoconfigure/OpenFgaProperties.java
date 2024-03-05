@@ -5,68 +5,100 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix="openfga")
 public class OpenFgaProperties {
 
-    private String fgaApiUrl;
-    private String fgaStoreId;
-    private String fgaApiTokenIssuer;
-    private String fgaApiAudience;
-    private String fgaClientId;
-    private String fgaClientSecret;
+    private String apiUrl;
+    private String storeId;
+    private String authorizationModelId;
 
-    private String fgaAuthorizationModelId;
+    private Credentials credentials;
 
-    public String getFgaApiUrl() {
-        return fgaApiUrl;
+    public String getApiUrl() {
+        return apiUrl;
     }
 
-    public void setFgaApiUrl(String fgaApiUrl) {
-        this.fgaApiUrl = fgaApiUrl;
+    public void setApiUrl(String apiUrl) {
+        this.apiUrl = apiUrl;
     }
 
-    public String getFgaStoreId() {
-        return fgaStoreId;
+    public String getStoreId() {
+        return storeId;
     }
 
-    public void setFgaStoreId(String fgaStoreId) {
-        this.fgaStoreId = fgaStoreId;
+    public void setStoreId(String storeId) {
+        this.storeId = storeId;
     }
 
-    public String getFgaApiTokenIssuer() {
-        return fgaApiTokenIssuer;
+    public String getAuthorizationModelId() {
+        return authorizationModelId;
     }
 
-    public void setFgaApiTokenIssuer(String fgaApiTokenIssuer) {
-        this.fgaApiTokenIssuer = fgaApiTokenIssuer;
+    public void setAuthorizationModelId(String authorizationModelId) {
+        this.authorizationModelId = authorizationModelId;
     }
 
-    public String getFgaApiAudience() {
-        return fgaApiAudience;
+    public Credentials getCredentials() {
+        return credentials;
     }
 
-    public void setFgaApiAudience(String fgaApiAudience) {
-        this.fgaApiAudience = fgaApiAudience;
+    public void setCredentials(Credentials credentials) {
+        this.credentials = credentials;
     }
 
-    public String getFgaClientId() {
-        return fgaClientId;
-    }
+    public static class Credentials {
 
-    public void setFgaClientId(String fgaClientId) {
-        this.fgaClientId = fgaClientId;
-    }
+        private String apiToken;
+        private String apiTokenIssuer;
+        private String apiAudience;
+        private String clientId;
+        private String clientSecret;
 
-    public String getFgaClientSecret() {
-        return fgaClientSecret;
-    }
+        private String scopes;
 
-    public void setFgaClientSecret(String fgaClientSecret) {
-        this.fgaClientSecret = fgaClientSecret;
-    }
+        public String getApiTokenIssuer() {
+            return apiTokenIssuer;
+        }
 
-    public String getFgaAuthorizationModelId() {
-        return fgaAuthorizationModelId;
-    }
+        public void setApiTokenIssuer(String apiTokenIssuer) {
+            this.apiTokenIssuer = apiTokenIssuer;
+        }
 
-    public void setFgaAuthorizationModelId(String fgaAuthorizationModelId) {
-        this.fgaAuthorizationModelId = fgaAuthorizationModelId;
+        public String getApiAudience() {
+            return apiAudience;
+        }
+
+        public void setApiAudience(String apiAudience) {
+            this.apiAudience = apiAudience;
+        }
+
+        public String getClientId() {
+            return clientId;
+        }
+
+        public void setClientId(String clientId) {
+            this.clientId = clientId;
+        }
+
+        public String getClientSecret() {
+            return clientSecret;
+        }
+
+        public void setClientSecret(String clientSecret) {
+            this.clientSecret = clientSecret;
+        }
+
+        public String getApiToken() {
+            return apiToken;
+        }
+
+        public void setApiToken(String apiToken) {
+            this.apiToken = apiToken;
+        }
+
+        public String getScopes() {
+            return scopes;
+        }
+
+        public void setScopes(String scopes) {
+            this.scopes = scopes;
+        }
     }
 }

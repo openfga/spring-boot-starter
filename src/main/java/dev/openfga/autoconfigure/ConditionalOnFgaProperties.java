@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.METHOD })
-@ConditionalOnProperty(name = {"openfga.fga-api-url"})
+@ConditionalOnProperty(name = {"openfga.api-url"})
 public @interface ConditionalOnFgaProperties {}
