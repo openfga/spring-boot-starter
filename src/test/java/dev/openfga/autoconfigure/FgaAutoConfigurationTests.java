@@ -50,7 +50,7 @@ public class FgaAutoConfigurationTests {
     @Test
     public void beanConfiguredForOauth2() {
         this.contextRunner
-                .withPropertyValues("openfga.api-url=https://fga-api-url",
+                .withPropertyValues("openfga.api-url=https://api.fga.example",
                         "openfga.authorization-model-id=authorization model ID",
                         "openfga.store-id=store ID",
                         "openfga.credentials.client-id=client ID",
