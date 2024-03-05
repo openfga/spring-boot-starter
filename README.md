@@ -8,15 +8,15 @@ Configure your application properties:
 
 ```yaml
 openfga:
-  api-url: FGA-API-URL
-  store-id: STORE-ID
-  authorization-model-id: AUTHORIZATION-MODEL-ID
+  api-url: FGA_API_URL
+  store-id: STORE_ID
+  authorization-model-id: AUTHORIZATION_MODEL_ID
   credentials:
     api-token: API-TOKEN # takes precedence if set
-    client-id: CLIENT-ID
-    client-secret: CLIENT-SECRET
-    api-token-issuer: API-TOKEN-ISSUER
-    api-audience: API-AUDIENCE
+    client-id: CLIENT_ID
+    client-secret: CLIENT_SECRET
+    api-token-issuer: API_TOKEN_ISSUER
+    api-audience: API_AUDIENCE
     scopes: SCOPE1 SCOPE2
 ```
 
