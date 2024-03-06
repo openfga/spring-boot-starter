@@ -3,12 +3,10 @@ package dev.openfga.autoconfigure;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.Set;
-
 /**
  * Properties used to configure an {@link dev.openfga.sdk.api.client.OpenFgaClient}
  */
-@ConfigurationProperties(prefix="openfga")
+@ConfigurationProperties(prefix = "openfga")
 public class OpenFgaProperties implements InitializingBean {
 
     private String apiUrl;
@@ -63,18 +61,24 @@ public class OpenFgaProperties implements InitializingBean {
             }
             CredentialsConfiguration credentialsConfig = credentialsProperty.getConfig();
             switch (credentialsMethod) {
-                case NONE  -> {}
+                case NONE -> {}
                 case API_TOKEN -> {
                     if (credentialsConfig == null || credentialsConfig.getApiToken() == null) {
-                        throw new IllegalStateException("'API_TOKEN' credentials method specified, but no token specified");
+                        throw new IllegalStateException(
+                                "'API_TOKEN' credentials method specified, but no token specified");
                     }
                 }
                 case CLIENT_CREDENTIALS -> {
-                    if (credentialsConfig == null || credentialsConfig.getApiTokenIssuer() == null || credentialsConfig.getClientId() == null || credentialsConfig.getClientSecret() == null) {
-                        throw new IllegalStateException("'CLIENT_CREDENTIALS' configuration must contain 'client-id', 'client-secret', and 'api-token-issuer'");
+                    if (credentialsConfig == null
+                            || credentialsConfig.getApiTokenIssuer() == null
+                            || credentialsConfig.getClientId() == null
+                            || credentialsConfig.getClientSecret() == null) {
+                        throw new IllegalStateException(
+                                "'CLIENT_CREDENTIALS' configuration must contain 'client-id', 'client-secret', and 'api-token-issuer'");
                     }
                 }
-                default -> throw new IllegalStateException("credentials method must be either 'NONE', 'API_TOKEN', or 'CLIENT_CREDENTIALS'");
+                default -> throw new IllegalStateException(
+                        "credentials method must be either 'NONE', 'API_TOKEN', or 'CLIENT_CREDENTIALS'");
             }
         }
     }
