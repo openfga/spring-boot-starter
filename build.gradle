@@ -53,14 +53,12 @@ publishing {
 }
 
 spotless {
-    // comment out below to run spotless as part of the `check` task
-    enforceCheck false
     format 'misc', {
         // define the files (e.g. '*.gradle', '*.md') to apply `misc` to
         target '.gitignore', '*.gradle'
         // define the steps to apply to those files
         trimTrailingWhitespace()
-        indentWithSpaces() // Takes an integer argument if you don't like 4
+        indentWithSpaces()
         endWithNewline()
     }
     java {
@@ -72,8 +70,4 @@ spotless {
 
 tasks.register('fmt') {
     dependsOn 'spotlessApply'
-}
-
-tasks.named('check').configure {
-    dependsOn 'spotlessCheck'
 }
