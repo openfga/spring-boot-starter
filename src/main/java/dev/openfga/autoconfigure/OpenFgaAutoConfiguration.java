@@ -35,8 +35,10 @@ public class OpenFgaAutoConfiguration {
         if (credentialsProperties != null) {
             if (OpenFgaProperties.CredentialsMethod.API_TOKEN.equals(credentialsProperties.getMethod())) {
                 credentials.setCredentialsMethod(CredentialsMethod.API_TOKEN);
-                credentials.setApiToken(new ApiToken(credentialsProperties.getConfig().getApiToken()));
-            } else if (OpenFgaProperties.CredentialsMethod.CLIENT_CREDENTIALS.equals(credentialsProperties.getMethod())) {
+                credentials.setApiToken(
+                        new ApiToken(credentialsProperties.getConfig().getApiToken()));
+            } else if (OpenFgaProperties.CredentialsMethod.CLIENT_CREDENTIALS.equals(
+                    credentialsProperties.getMethod())) {
                 ClientCredentials clientCredentials = new ClientCredentials()
                         .clientId(credentialsProperties.getConfig().getClientId())
                         .clientSecret(credentialsProperties.getConfig().getClientSecret())
