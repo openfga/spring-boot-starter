@@ -1,10 +1,7 @@
 package dev.openfga.autoconfigure;
 
 import dev.openfga.sdk.api.client.OpenFgaClient;
-import dev.openfga.sdk.api.configuration.ApiToken;
-import dev.openfga.sdk.api.configuration.ClientConfiguration;
-import dev.openfga.sdk.api.configuration.ClientCredentials;
-import dev.openfga.sdk.api.configuration.Credentials;
+import dev.openfga.sdk.api.configuration.*;
 import dev.openfga.sdk.errors.FgaInvalidParameterException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -31,16 +28,18 @@ public class OpenFgaAutoConfiguration {
         var credentialsProperties = openFgaProperties.getCredentials();
 
         if (credentialsProperties != null) {
-            if (credentialsProperties.getApiToken() != null) {
-                credentials.setApiToken(new ApiToken(credentialsProperties.getApiToken()));
-            } else {
+            if ("API_TOKEN".equalsIgnoreCase(credentialsProperties.getMethod())) {
+                credentials.setCredentialsMethod(CredentialsMethod.API_TOKEN);
+                credentials.setApiToken(new ApiToken(credentialsProperties.getConfig().getApiToken()));
+            } else if ("CLIENT_CREDENTIALS".equalsIgnoreCase(credentialsProperties.getMethod())) {
                 ClientCredentials clientCredentials = new ClientCredentials()
-                        .clientId(credentialsProperties.getClientId())
-                        .clientSecret(credentialsProperties.getClientSecret())
-                        .apiTokenIssuer(credentialsProperties.getApiTokenIssuer())
-                        .apiAudience(credentialsProperties.getApiAudience())
-                        .scopes(credentialsProperties.getScopes());
+                        .clientId(credentialsProperties.getConfig().getClientId())
+                        .clientSecret(credentialsProperties.getConfig().getClientSecret())
+                        .apiTokenIssuer(credentialsProperties.getConfig().getApiTokenIssuer())
+                        .apiAudience(credentialsProperties.getConfig().getApiAudience())
+                        .scopes(credentialsProperties.getConfig().getScopes());
 
+                credentials.setCredentialsMethod(CredentialsMethod.CLIENT_CREDENTIALS);
                 credentials.setClientCredentials(clientCredentials);
             }
         }

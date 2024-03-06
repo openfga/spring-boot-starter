@@ -1,9 +1,12 @@
 package dev.openfga.autoconfigure;
 
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.Set;
+
 @ConfigurationProperties(prefix="openfga")
-public class OpenFgaProperties {
+public class OpenFgaProperties implements InitializingBean {
 
     private String apiUrl;
     private String storeId;
@@ -43,8 +46,59 @@ public class OpenFgaProperties {
         this.credentials = credentials;
     }
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        validate();
+    }
+
+    public void validate() {
+        Credentials credentialsProperty = getCredentials();
+        if (credentialsProperty != null) {
+            String credentialsMethod = getCredentials().getMethod();
+            if (credentialsMethod == null) {
+                throw new IllegalStateException("credentials method must not be null");
+            }
+            if (!Set.of("NONE", "API_TOKEN", "CLIENT_CREDENTIALS").contains(credentialsMethod.toUpperCase())) {
+                throw new IllegalStateException("credentials method must be either 'NONE', 'API_TOKEN', or 'CLIENT_CREDENTIALS'");
+            }
+
+            CredentialsConfiguration credentialsConfig = credentialsProperty.getConfig();
+            if ("API_TOKEN".equalsIgnoreCase(credentialsMethod)) {
+                if (credentialsConfig == null || credentialsConfig.getApiToken() == null) {
+                    throw new IllegalStateException("'API_TOKEN' credentials method specified, but no token specified");
+                }
+            }
+            if ("CLIENT_CREDENTIALS".equalsIgnoreCase(credentialsMethod)) {
+                if (credentialsConfig == null || credentialsConfig.getApiTokenIssuer() == null || credentialsConfig.getClientId() == null || credentialsConfig.getClientSecret() == null) {
+                    throw new IllegalStateException("'CLIENT_CREDENTIALS' configuration must contain 'client-id', 'client-secret', and 'api-token-issuer'");
+                }
+            }
+        }
+    }
+
     public static class Credentials {
 
+        private String method;
+        private CredentialsConfiguration config;
+
+        public String getMethod() {
+            return method;
+        }
+
+        public void setMethod(String method) {
+            this.method = method;
+        }
+
+        public CredentialsConfiguration getConfig() {
+            return config;
+        }
+
+        public void setConfig(CredentialsConfiguration config) {
+            this.config = config;
+        }
+    }
+
+    public static class CredentialsConfiguration {
         private String apiToken;
         private String apiTokenIssuer;
         private String apiAudience;

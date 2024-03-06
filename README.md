@@ -4,20 +4,43 @@ A Spring Boot Starter for OpenFGA.
 
 ## Configuration
 
-Configure your application properties:
+No authorization:
 
 ```yaml
 openfga:
-  api-url: FGA_API_URL
-  store-id: STORE_ID
-  authorization-model-id: AUTHORIZATION_MODEL_ID
+  api-url: YOUR_FGA_API_URL
+  store-id: YOUR_FGA_STORE_ID
+  authorization-model-id: YOUR_FGA_AUTHORIZATION_MODEL_ID
+```
+
+API token authorization:
+
+```yaml
+openfga:
+  api-url: YOUR_FGA_API_URL
+  store-id: YOUR_FGA_STORE_ID
+  authorization-model-id: YOUR_FGA_AUTHORIZATION_MODEL_ID
   credentials:
-    api-token: API-TOKEN # takes precedence if set
-    client-id: CLIENT_ID
-    client-secret: CLIENT_SECRET
-    api-token-issuer: API_TOKEN_ISSUER
-    api-audience: API_AUDIENCE
-    scopes: SCOPE1 SCOPE2
+    method: API_TOKEN
+    config:
+      api-token: YOUR_API_TOKEN
+```
+
+Client credentials authorization:
+
+```yaml
+openfga:
+  api-url: YOUR_FGA_API_URL
+  store-id: YOUR_FGA_STORE_ID
+  authorization-model-id: YOUR_FGA_AUTHORIZATION_MODEL_ID
+  credentials:
+    method: CLIENT_CONFIGURATION
+    config:
+        client-id: YOUR_CLIENT_ID
+        client-secret: YOUR_CLIENT_SECRET
+        api-token-issuer: YOUR_API_TOKEN_ISSUER
+        api-audience: YOUR_API_AUDIENCE
+        scopes: YOUR_SPACE_SEPERATED_SCOPES
 ```
 
 Your application can then inject the configured `openFgaClient`:
