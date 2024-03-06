@@ -78,7 +78,7 @@ public class FgaAutoConfigurationTests {
                         "openfga.authorization-model-id=authorization model ID",
                         "openfga.store-id=store ID",
                         "openfga.credentials.method=API_TOKEN",
-                        "openfga.credentials.config.api-token=XYZ"//,
+                        "openfga.credentials.config.api-token=XYZ"
                 )
                 .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
                 .run((context) -> {
@@ -167,5 +167,20 @@ public class FgaAutoConfigurationTests {
         });
 
         assertThat(exception.getCause().getMessage(), containsString("credentials method must not be null"));
+    }
+
+    @Test
+    public void failsIfCredentialsWithInvalidMethod() {
+        assertThrows(IllegalStateException.class, () -> {
+            this.contextRunner
+                    .withPropertyValues("openfga.api-url=https://api.fga.example",
+                            "openfga.authorization-model-id=authorization model ID",
+                            "openfga.store-id=store ID",
+                            "openfga.credentials.method=INVALID",
+                            "openfga.credentials.config.api-token=API_TOKEN"
+                    )
+                    .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
+                    .run((context) -> context.getBean("openFgaConfig"));
+        });
     }
 }

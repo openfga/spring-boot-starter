@@ -9,6 +9,11 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Configures an {@code openFgaClient} bean based on configuration values.
+ * The bean will only be created if the {@link OpenFgaClient} is present on
+ * the classpath, and the {@code openfga.api-url} is specified.
+ */
 @Configuration
 @ConditionalOnFgaProperties
 @EnableConfigurationProperties(OpenFgaProperties.class)
@@ -28,10 +33,10 @@ public class OpenFgaAutoConfiguration {
         var credentialsProperties = openFgaProperties.getCredentials();
 
         if (credentialsProperties != null) {
-            if ("API_TOKEN".equalsIgnoreCase(credentialsProperties.getMethod())) {
+            if (OpenFgaProperties.CredentialsMethod.API_TOKEN.equals(credentialsProperties.getMethod())) {
                 credentials.setCredentialsMethod(CredentialsMethod.API_TOKEN);
                 credentials.setApiToken(new ApiToken(credentialsProperties.getConfig().getApiToken()));
-            } else if ("CLIENT_CREDENTIALS".equalsIgnoreCase(credentialsProperties.getMethod())) {
+            } else if (OpenFgaProperties.CredentialsMethod.CLIENT_CREDENTIALS.equals(credentialsProperties.getMethod())) {
                 ClientCredentials clientCredentials = new ClientCredentials()
                         .clientId(credentialsProperties.getConfig().getClientId())
                         .clientSecret(credentialsProperties.getConfig().getClientSecret())
