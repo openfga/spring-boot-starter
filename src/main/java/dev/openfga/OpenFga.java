@@ -34,7 +34,7 @@ public class OpenFga {
             throw new IllegalStateException(
                     "No user provided, and no authentication could be found in the security context");
         }
-        return check(objectId, objectType, relation, userType, authentication.getName());
+        return check(objectType, objectId, relation, userType, authentication.getName());
     }
 
     /**
@@ -56,7 +56,7 @@ public class OpenFga {
         try {
             return Boolean.TRUE.equals(fgaClient.check(body).get().getAllowed());
         } catch (InterruptedException | FgaInvalidParameterException | ExecutionException e) {
-            throw new RuntimeException("Error performing FGA check", e);
+            throw new OpenFgaCheckException("Error performing FGA check", e);
         }
     }
 }
