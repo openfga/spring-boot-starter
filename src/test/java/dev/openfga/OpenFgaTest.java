@@ -1,5 +1,6 @@
 package dev.openfga;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -102,6 +103,9 @@ public class OpenFgaTest {
         when(mockClient.check(any(ClientCheckRequest.class))).thenThrow(FgaInvalidParameterException.class);
 
         // then
-        assertThrows(OpenFgaCheckException.class, () -> openFga.check("document", "docId", "viewer", "user", "userId"));
+        OpenFgaCheckException exception = assertThrows(
+                OpenFgaCheckException.class, () -> openFga.check("document", "docId", "viewer", "user", "userId"));
+        assertThat(exception.getMessage(), is("Error performing FGA check"));
+        assertThat(exception.getCause(), is(instanceOf(FgaInvalidParameterException.class)));
     }
 }
