@@ -1,5 +1,6 @@
 package dev.openfga.autoconfigure;
 
+import dev.openfga.OpenFga;
 import dev.openfga.sdk.api.client.OpenFgaClient;
 import dev.openfga.sdk.api.configuration.*;
 import dev.openfga.sdk.errors.FgaInvalidParameterException;
@@ -67,4 +68,11 @@ public class OpenFgaAutoConfiguration {
             throw new BeanCreationException("Failed to create OpenFgaClient", e);
         }
     }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public OpenFga openFga(OpenFgaClient openFgaClient) {
+        return new OpenFga(openFgaClient);
+    }
+
 }
