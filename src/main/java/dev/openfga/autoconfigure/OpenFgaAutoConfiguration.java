@@ -75,5 +75,4 @@ public class OpenFgaAutoConfiguration {
     public OpenFga openFga(OpenFgaClient openFgaClient) {
         return new OpenFga(openFgaClient);
     }
-
 }
