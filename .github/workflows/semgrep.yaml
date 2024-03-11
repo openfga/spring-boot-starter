@@ -1,0 +1,21 @@
+name: Semgrep
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  semgrep:
+    name: Scan
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep
+    if: (github.repository_owner == 'openfga' && github.actor != 'dependabot[bot]' && github.actor != 'snyk-bot')
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - run: semgrep ci --no-suppress-errors
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
