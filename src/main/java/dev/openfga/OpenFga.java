@@ -8,7 +8,19 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-// TODO what package?
+/**
+ * A bean that can be used to perform common FGA tasks, such as execute a check request.
+ *
+ * Can be used in {@code @PreAuthorize} or {@code PostAuthorize} to provide method-level FGA
+ * protection for a requested resource. For example:
+ * <pre>
+ *
+ * {@code @PreAuthorize("@openFga.check('document', #id, 'reader', 'user', 'authentication?.name')")}
+ * public Document getDocument(String id) {
+ *     repository.findById(id);
+ * }
+ * </pre>
+ */
 @Component
 public class OpenFga {
 
@@ -20,13 +32,16 @@ public class OpenFga {
     }
 
     /**
-     * Perform an FGA check. The user ID will be obtained from the authentication name in the {@link org.springframework.security.core.context.SecurityContext}
+     * Perform an FGA check. Returns {@code true} if the user has the specified relationship with the object, {@code false}
+     * otherwise. The user ID will be obtained from the authentication name in the {@link org.springframework.security.core.context.SecurityContext}
      *
-     * @param objectType
-     * @param objectId
-     * @param relation
-     * @param userType
+     * @param objectType The object type of the check
+     * @param objectId The ID of the object to check
+     * @param relation The required relation between the user and the object
+     * @param userType The type of the user
      * @return true if the user has the required relation to the object, false otherwise
+     *
+     * @see <a href="https://openfga.dev/api/service#/Relationship%20Queries/Check">FGA Check API</a>
      */
     public boolean check(String objectType, String objectId, String relation, String userType) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -38,14 +53,17 @@ public class OpenFga {
     }
 
     /**
-     * Perform an FGA check.
+     * Perform an FGA check. Returns {@code true} if the user has the specified relationship with the object, {@code false}
+     * otherwise. The user ID will be obtained from the authentication name in the {@link org.springframework.security.core.context.SecurityContext}
      *
-     * @param objectType
-     * @param objectId
-     * @param relation
-     * @param userType
-     * @param userId
+     * @param objectType The object type of the check
+     * @param objectId The ID of the object to check
+     * @param relation The required relation between the user and the object
+     * @param userType The type of the user
+     * @param userId The ID of the user
      * @return true if the user has the required relation to the object, false otherwise
+     *
+     * @see <a href="https://openfga.dev/api/service#/Relationship%20Queries/Check">FGA Check API</a>
      */
     public boolean check(String objectType, String objectId, String relation, String userType, String userId) {
         var body = new ClientCheckRequest()
