@@ -32,6 +32,7 @@ public class FgaAutoConfigurationTests {
                 .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
                 .run((context) -> {
                     assertThat(context.containsBean("openFgaClient"), is(true));
+                    assertThat(context.containsBean("openFga"), is(true));
                 });
     }
 

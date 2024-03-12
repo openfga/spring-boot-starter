@@ -1,5 +1,6 @@
 package dev.openfga.autoconfigure;
 
+import dev.openfga.OpenFga;
 import dev.openfga.sdk.api.client.OpenFgaClient;
 import dev.openfga.sdk.api.configuration.*;
 import dev.openfga.sdk.errors.FgaInvalidParameterException;
@@ -10,9 +11,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configures an {@code openFgaClient} bean based on configuration values.
- * The bean will only be created if the {@link OpenFgaClient} is present on
- * the classpath, and the {@code openfga.api-url} is specified.
+ * Configures an {@code openFgaClient} and {@code openFga} beans based
+ * on configuration values. The beans will only be created if the
+ * {@link OpenFgaClient} is present on the classpath, and the
+ * {@code openfga.api-url} is specified.
  */
 @Configuration
 @ConditionalOnFgaProperties
@@ -66,5 +68,11 @@ public class OpenFgaAutoConfiguration {
         } catch (FgaInvalidParameterException e) {
             throw new BeanCreationException("Failed to create OpenFgaClient", e);
         }
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public OpenFga openFga(OpenFgaClient openFgaClient) {
+        return new OpenFga(openFgaClient);
     }
 }
