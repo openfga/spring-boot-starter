@@ -1,78 +1,61 @@
 plugins {
-    id 'java-library'
-    id 'org.springframework.boot' version '3.2.2' apply false
-    id 'io.spring.dependency-management' version '1.1.4'
-
+    id 'java'
     id 'com.diffplug.spotless' version '6.25.0'
-
-    id 'maven-publish'
+//    id 'maven-publish'
 }
 
-group = "dev.openfga"
-version = "0.0.1-SNAPSHOT"
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'com.diffplug.spotless'
 
-java {
-    sourceCompatibility = 17
-    targetCompatibility = 17
-}
+    group = "dev.openfga"
+    version = "0.0.1-SNAPSHOT"
 
-repositories {
-    mavenCentral()
-}
-
-dependencyManagement {
-    imports {
-        mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+    java {
+        sourceCompatibility = 17
+        targetCompatibility = 17
     }
-}
 
-dependencies {
-    implementation 'org.springframework.boot:spring-boot'
-    implementation 'org.springframework.boot:spring-boot-autoconfigure'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
+    repositories {
+        mavenCentral()
+    }
 
-    api 'dev.openfga:openfga-sdk:0.4.0'
-
-    // https://docs.gradle.org/8.6/userguide/upgrading_version_8.html#test_framework_implementation_dependencies
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'org.hamcrest:hamcrest:2.2'
-    testImplementation 'org.mockito:mockito-core:5.11.0'
-
-
-}
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = "${groupId}"
-            artifactId = 'openfga-spring-boot-starter'
-            version = "${version}"
-
-            from components.java
+    spotless {
+        format 'misc', {
+            // define the files (e.g. '*.gradle', '*.md') to apply `misc` to
+            target '.gitignore', '*.gradle'
+            // define the steps to apply to those files
+            trimTrailingWhitespace()
+            indentWithSpaces()
+            endWithNewline()
+        }
+        java {
+            palantirJavaFormat()
+            removeUnusedImports()
+            importOrder()
         }
     }
+
+    tasks.register('fmt') {
+        dependsOn 'spotlessApply'
+    }
+
 }
 
-spotless {
-    format 'misc', {
-        // define the files (e.g. '*.gradle', '*.md') to apply `misc` to
-        target '.gitignore', '*.gradle'
-        // define the steps to apply to those files
-        trimTrailingWhitespace()
-        indentWithSpaces()
-        endWithNewline()
-    }
-    java {
-        palantirJavaFormat()
-        removeUnusedImports()
-        importOrder()
-    }
-}
+//dependencyManagement {
+//    imports {
+//        mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+//    }
+//}
 
-tasks.register('fmt') {
-    dependsOn 'spotlessApply'
-}
+//publishing {
+//    publications {
+//        maven(MavenPublication) {
+//            groupId = "${groupId}"
+//            artifactId = 'openfga-spring-boot-starter'
+//            version = "${version}"
+//
+//            from components.java
+//        }
+//    }
+//}

@@ -1,1 +1,3 @@
 rootProject.name = 'fga-spring-boot-starter'
+
+include 'openfga-spring-boot-starter'
