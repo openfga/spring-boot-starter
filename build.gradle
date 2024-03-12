@@ -20,10 +20,6 @@ repositories {
     mavenCentral()
 }
 
-test {
-    useJUnitPlatform()
-}
-
 dependencyManagement {
     imports {
         mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
@@ -36,6 +32,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
     api 'dev.openfga:openfga-sdk:0.4.0'
+
+    // https://docs.gradle.org/8.6/userguide/upgrading_version_8.html#test_framework_implementation_dependencies
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
