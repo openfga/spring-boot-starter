@@ -21,7 +21,7 @@ public class FgaAutoConfigurationTests {
         this.contextRunner
                 .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
                 .run((context) -> {
-                    assertThat(context.containsBean("openFgaClient"), is(false));
+                    assertThat(context.containsBean("fgaClient"), is(false));
                 });
     }
 
@@ -31,8 +31,8 @@ public class FgaAutoConfigurationTests {
                 .withPropertyValues("openfga.api-url=https://fga-api-url")
                 .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
                 .run((context) -> {
-                    assertThat(context.containsBean("openFgaClient"), is(true));
-                    assertThat(context.containsBean("openFga"), is(true));
+                    assertThat(context.containsBean("fgaClient"), is(true));
+                    assertThat(context.containsBean("fga"), is(true));
                 });
     }
 
@@ -47,7 +47,7 @@ public class FgaAutoConfigurationTests {
                         "openfga.credentials.config.api-token=XYZ")
                 .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
                 .run((context) -> {
-                    ClientConfiguration config = (ClientConfiguration) context.getBean("openFgaConfig");
+                    ClientConfiguration config = (ClientConfiguration) context.getBean("fgaConfig");
                     assertThat(config.getApiUrl(), is("https://api.fga.example"));
                     assertThat(config.getAuthorizationModelId(), is("authorization model ID"));
                     assertThat(config.getStoreId(), is("store ID"));
@@ -64,7 +64,7 @@ public class FgaAutoConfigurationTests {
                         "openfga.store-id=store ID")
                 .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
                 .run((context) -> {
-                    ClientConfiguration config = (ClientConfiguration) context.getBean("openFgaConfig");
+                    ClientConfiguration config = (ClientConfiguration) context.getBean("fgaConfig");
                     assertThat(config.getApiUrl(), is("https://api.fga.example"));
                     assertThat(config.getAuthorizationModelId(), is("authorization model ID"));
                     assertThat(config.getStoreId(), is("store ID"));
@@ -83,7 +83,7 @@ public class FgaAutoConfigurationTests {
                         "openfga.credentials.config.api-token=XYZ")
                 .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
                 .run((context) -> {
-                    ClientConfiguration config = (ClientConfiguration) context.getBean("openFgaConfig");
+                    ClientConfiguration config = (ClientConfiguration) context.getBean("fgaConfig");
                     assertThat(config.getApiUrl(), is("https://api.fga.example"));
                     assertThat(config.getAuthorizationModelId(), is("authorization model ID"));
                     assertThat(config.getStoreId(), is("store ID"));
@@ -108,7 +108,7 @@ public class FgaAutoConfigurationTests {
                         "openfga.credentials.config.scopes=SCOPE1 SCOPE2")
                 .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
                 .run((context) -> {
-                    ClientConfiguration config = (ClientConfiguration) context.getBean("openFgaConfig");
+                    ClientConfiguration config = (ClientConfiguration) context.getBean("fgaConfig");
                     assertThat(config.getApiUrl(), is("https://api.fga.example"));
                     assertThat(config.getAuthorizationModelId(), is("authorization model ID"));
                     assertThat(config.getStoreId(), is("store ID"));
@@ -134,7 +134,7 @@ public class FgaAutoConfigurationTests {
                             "openfga.store-id=store ID",
                             "openfga.credentials.method=API_TOKEN")
                     .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
-                    .run((context) -> context.getBean("openFgaConfig"));
+                    .run((context) -> context.getBean("fgaConfig"));
         });
 
         assertThat(
@@ -152,7 +152,7 @@ public class FgaAutoConfigurationTests {
                             "openfga.store-id=store ID",
                             "openfga.credentials.method=CLIENT_CREDENTIALS")
                     .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
-                    .run((context) -> context.getBean("openFgaConfig"));
+                    .run((context) -> context.getBean("fgaConfig"));
         });
 
         assertThat(
@@ -171,7 +171,7 @@ public class FgaAutoConfigurationTests {
                             "openfga.store-id=store ID",
                             "openfga.credentials.config.api-token=API_TOKEN")
                     .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
-                    .run((context) -> context.getBean("openFgaConfig"));
+                    .run((context) -> context.getBean("fgaConfig"));
         });
 
         assertThat(exception.getCause().getMessage(), containsString("credentials method must not be null"));
@@ -188,7 +188,7 @@ public class FgaAutoConfigurationTests {
                             "openfga.credentials.method=INVALID",
                             "openfga.credentials.config.api-token=API_TOKEN")
                     .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
-                    .run((context) -> context.getBean("openFgaConfig"));
+                    .run((context) -> context.getBean("fgaConfig"));
         });
     }
 }
