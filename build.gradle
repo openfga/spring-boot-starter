@@ -37,6 +37,10 @@ subprojects {
         }
     }
 
+    test {
+        finalizedBy jacocoTestReport // report is always generated after tests run
+    }
+    
     jacocoTestReport {
         // tests are required to run before generating a JaCoCo coverage report.
         dependsOn test
