@@ -1,11 +1,13 @@
 plugins {
     id 'java'
     id 'com.diffplug.spotless' version '6.25.0'
+    id 'jacoco'
 }
 
 subprojects {
     apply plugin: 'java'
     apply plugin: 'com.diffplug.spotless'
+    apply plugin: 'jacoco'
 
     group = "dev.openfga"
     version = "0.0.1-SNAPSHOT"
@@ -33,6 +35,15 @@ subprojects {
             removeUnusedImports()
             importOrder()
         }
+    }
+
+    test {
+        finalizedBy jacocoTestReport // report is always generated after tests run
+    }
+    
+    jacocoTestReport {
+        // tests are required to run before generating a JaCoCo coverage report.
+        dependsOn test
     }
 
     tasks.register('fmt') {
