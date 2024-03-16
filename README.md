@@ -43,20 +43,20 @@ openfga:
         scopes: YOUR_SPACE_SEPERATED_SCOPES
 ```
 
-Your application can then inject the configured `openFgaClient`:
+Your application can then inject the configured `fgaClient`:
 
 ```java
 @Service
 public class MyService {
     
     @Autowired
-    private OpenFgaClient openFgaClient;
+    private OpenFgaClient fgaClient;
 }
 ```
 
 ## Usage
 
-Once configured, your application can inject the configured `openFgaClient` bean into any component.
+Once configured, your application can inject the configured `fgaClient` bean into any component.
 This can be used to interact with the FGA API, for example to write authorization data:
 
 ```java
@@ -77,12 +77,12 @@ public Document createDoc(String id) {
 }
 ```
 
-This starter also creates an `openFga` bean, which can be used in conjunction with Spring Security's method
+This starter also creates an `fga` bean, which can be used in conjunction with Spring Security's method
 security to protect access to resources using FGA:
 
 ```java
 // Method body will only execute if the FGA check returns true. 403 otherwise.
-@PreAuthorize("@openFga.check('document', #docId, 'reader', 'user', 'authentication?.name')")
+@PreAuthorize("@fga.check('document', #docId, 'reader', 'user', 'authentication?.name')")
 public Document getDocument(@PathVariable String docId) {
     return repository.findById(id);
 }
@@ -93,7 +93,7 @@ will be used as the user ID:
 
 ```java
 // Method body will only execute if the FGA check returns true. 403 otherwise.
-@PreAuthorize("@openFga.check('document', #docId, 'reader', 'user')")
+@PreAuthorize("@fga.check('document', #docId, 'reader', 'user')")
 public Document getDocument(@PathVariable String docId) {
     return repository.findById(id);
 }

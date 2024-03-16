@@ -29,7 +29,7 @@ public class OpenFgaAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ClientConfiguration openFgaConfig() {
+    public ClientConfiguration fgaConfig() {
         var credentials = new Credentials();
 
         var credentialsProperties = openFgaProperties.getCredentials();
@@ -62,7 +62,7 @@ public class OpenFgaAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public OpenFgaClient openFgaClient(ClientConfiguration configuration) {
+    public OpenFgaClient fgaClient(ClientConfiguration configuration) {
         try {
             return new OpenFgaClient(configuration);
         } catch (FgaInvalidParameterException e) {
@@ -72,7 +72,7 @@ public class OpenFgaAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public OpenFga openFga(OpenFgaClient openFgaClient) {
+    public OpenFga fga(OpenFgaClient openFgaClient) {
         return new OpenFga(openFgaClient);
     }
 }
