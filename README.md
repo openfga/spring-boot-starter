@@ -24,6 +24,10 @@ OpenFGA is designed to make it easy for application builders to model their perm
 
 ## Getting Started
 
+### Requirements
+
+Java 17 and Spring Boot 3
+
 ### Configuring the starter
 
 The OpenFGA Spring Boot Starter can be configured via standard [Spring configuration](https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.external-config).
