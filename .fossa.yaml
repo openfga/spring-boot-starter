@@ -1,0 +1,9 @@
+version: 3
+
+server: https://app.fossa.com
+
+project:
+  id: github.com/openfga/spring-boot-starter
+  name: openfga/spring-boot-starter
+  link: openfga.dev
+  url: https://github.com/openfga/spring-boot-starter
