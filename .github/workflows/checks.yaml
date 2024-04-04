@@ -23,7 +23,6 @@ jobs:
         uses: fossas/fossa-action@main
         with:
           api-key: ${{ secrets.FOSSA_API_KEY }}
-          project: spring-boot-starter
           run-tests: true
   build:
     name: Run Checks
