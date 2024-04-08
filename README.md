@@ -118,7 +118,7 @@ security to protect access to resources using FGA:
 
 ```java
 // Method body will only execute if the FGA check returns true. 403 otherwise.
-@PreAuthorize("@fga.check('document', #docId, 'reader', 'user', 'authentication?.name')")
+@PreAuthorize("@fga.check('document', #docId, 'reader', 'user', authentication?.name)")
 public Document getDocument(@PathVariable String docId) {
     return repository.findById(id);
 }
