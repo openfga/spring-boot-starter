@@ -1,6 +1,10 @@
 name: Checks
 
-on: [pull_request, push]
+on:
+  merge_group:
+  push:
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   fossa:
