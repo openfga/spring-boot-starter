@@ -1,0 +1,86 @@
+{
+  "schema_version": "1.1",
+  "type_definitions": [
+    {
+      "type": "user",
+      "relations": {},
+      "metadata": null
+    },
+    {
+      "type": "document",
+      "relations": {
+        "can_change_owner": {
+          "computedUserset": {
+            "relation": "owner"
+          }
+        },
+        "owner": {
+          "this": {}
+        },
+        "can_read": {
+          "union": {
+            "child": [
+              {
+                "computedUserset": {
+                  "relation": "viewer"
+                }
+              },
+              {
+                "computedUserset": {
+                  "relation": "owner"
+                }
+              }
+            ]
+          }
+        },
+        "can_share": {
+          "computedUserset": {
+            "relation": "owner"
+          }
+        },
+        "viewer": {
+          "this": {}
+        },
+        "can_write": {
+          "computedUserset": {
+            "relation": "owner"
+          }
+        }
+      },
+      "metadata": {
+        "relations": {
+          "can_change_owner": {
+            "directly_related_user_types": []
+          },
+          "owner": {
+            "directly_related_user_types": [
+              {
+                "type": "user"
+              }
+            ]
+          },
+          "can_read": {
+            "directly_related_user_types": []
+          },
+          "can_share": {
+            "directly_related_user_types": []
+          },
+          "viewer": {
+            "directly_related_user_types": [
+              {
+                "type": "user"
+              },
+              {
+                "type": "user",
+                "wildcard": {}
+              }
+            ]
+          },
+          "can_write": {
+            "directly_related_user_types": []
+          }
+        }
+      }
+    }
+  ]
+}
