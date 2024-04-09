@@ -22,34 +22,6 @@ OpenFGA is designed to make it easy for application builders to model their perm
 - [Zanzibar Academy](https://zanzibar.academy)
 - [Google's Zanzibar Paper (2019)](https://research.google/pubs/pub48190/)
 
-## Installation
-
-The OpenFGA Spring Boot Starter is available on [Maven Central](https://central.sonatype.com/).
-
-It can be used with the following:
-
-* Gradle (Groovy)
-
-```groovy
-implementation 'dev.openfga:openfga-spring-boot-starter:0.0.1'
-```
-
-* Gradle (Kotlin)
-
-```kotlin
-implementation("dev.openfga:openfga-spring-boot-starter:0.0.1")
-```
-
-* Apache Maven
-
-```xml
-<dependency>
-    <groupId>dev.openfga</groupId>
-    <artifactId>openfga-spring-boot-starter</artifactId>
-    <version>0.0.1</version>
-</dependency>
-```
-
 ## Getting Started
 
 ### Requirements
