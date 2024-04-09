@@ -1,0 +1,60 @@
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+
+            pom {
+                group = 'dev.openfga'
+                name = 'openfga-spring-boot-starter'
+                version = '0.0.1'
+                description = 'This is the Spring Boot Starter for OpenFGA.'
+                url = 'https://openfga.dev'
+                licenses {
+                    license {
+                        name = 'Apache-2.0'
+                        url = 'https://github.com/openfga/spring-boot-starter/blob/main/LICENSE'
+                    }
+                }
+                developers {
+                    developer {
+                        name = 'OpenFGA'
+                        url = 'https://openfga.dev'
+                    }
+                }
+                scm {
+                    url = 'https://github.com/openfga/spring-boot-starter'
+                    connection = 'scm:git:git@github.com:openfga/spring-boot-starter.git'
+                    developerConnection = 'scm:git:git@github.com:openfga/spring-boot-starter.git'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = 'GitHubPackages'
+            url = 'https://maven.pkg.github.com/openfga/spring-boot-starter'
+            credentials {
+                username = System.getenv('GITHUB_ACTOR')
+                password = System.getenv('GITHUB_TOKEN')
+            }
+        }
+    }
+}
+
+signing {
+    def signingKey = System.getenv('ORG_GRADLE_PROJECT_SIGNINGKEY')
+    def signingPassword = System.getenv('ORG_GRADLE_PROJECT_SIGNINGPASSWORD')
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    sign publishing.publications.maven
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri('https://s01.oss.sonatype.org/service/local/'))
+            snapshotRepositoryUrl.set(uri('https://s01.oss.sonatype.org/content/repositories/snapshots/'))
+            username.set(System.getenv('MAVEN_USERNAME'))
+            password.set(System.getenv('MAVEN_PASSWORD'))
+        }
+    }
+}
