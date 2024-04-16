@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.4'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+java {
+    sourceCompatibility = 17
+    targetCompatibility = 17
+}
+
+repositories {
+    // uncomment the below line to use the SDK published to your local maven repository
+    // mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'dev.openfga:openfga-spring-boot-starter:0.0.1'
+}

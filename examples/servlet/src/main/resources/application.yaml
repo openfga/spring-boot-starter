@@ -1,0 +1,10 @@
+logging:
+  level:
+    org:
+      example: TRACE
+
+########## FGA CONFIG #########
+
+### NO AUTH - for example purposes only!! ###
+openfga:
+  api-url: http://localhost:4000
