@@ -53,7 +53,7 @@ jobs:
         uses: gradle/wrapper-validation-action@5188e9b5527a0a094cee21e2fe9a8ca44b4629af # v3.3.1
 
       - name: Publish package
-        uses: gradle/actions/setup-gradle@750cdda3edd6d51b7fdfc069d2e2818cf3c44f4c # v3.3.1
+        uses: gradle/actions/setup-gradle@db19848a5fa7950289d3668fb053140cf3028d43 # v3.3.2
         with:
           # Tasks created by https://github.com/gradle-nexus/publish-plugin
           arguments: publishToSonatype closeAndReleaseSonatypeStagingRepository
@@ -85,7 +85,7 @@ jobs:
         uses: gradle/wrapper-validation-action@5188e9b5527a0a094cee21e2fe9a8ca44b4629af # v3.3.1
 
       - name: Publish package
-        uses: gradle/actions/setup-gradle@750cdda3edd6d51b7fdfc069d2e2818cf3c44f4c # v3.3.1
+        uses: gradle/actions/setup-gradle@db19848a5fa7950289d3668fb053140cf3028d43 # v3.3.2
         with:
           # Tasks created by https://docs.gradle.org/current/userguide/publishing_maven.html
           arguments: publishAllPublicationsToGitHubPackagesRepository
