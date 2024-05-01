@@ -30,6 +30,9 @@ public class DocumentService {
      * @param id The ID of the document to get.
      * @return the document.
      */
+    // Note that here the user ID is hard-coded for simplicity. In a real application we
+    // would either drop the user ID argument (the currently authenticated principal's name would be used),
+    // or pass the value of the user ID associated with the request in some other way.
     @PreAuthorize("@fga.check('document', #id, 'can_read', 'user', 'anne')")
     public Optional<Document> getDocument(String id) {
         return documentSet.stream()
