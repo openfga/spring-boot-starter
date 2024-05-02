@@ -27,13 +27,12 @@ public class DocumentService {
      * Return the requested document, if it exists, only if the user has the
      * required FGA relationship.
      *
+     * Uses the currently authenticated principal as the user ID for the FGA check.
+     *
      * @param id The ID of the document to get.
      * @return the document.
      */
-    // Note that here the user ID is hard-coded for simplicity. In a real application we
-    // would either drop the user ID argument (the currently authenticated principal's name would be used),
-    // or pass the value of the user ID associated with the request in some other way.
-    @PreAuthorize("@fga.check('document', #id, 'can_read', 'user', 'anne')")
+    @PreAuthorize("@fga.check('document', #id, 'can_read', 'user')")
     public Optional<Document> getDocument(String id) {
         return documentSet.stream()
                 .filter(d -> d.id().equals(id))
