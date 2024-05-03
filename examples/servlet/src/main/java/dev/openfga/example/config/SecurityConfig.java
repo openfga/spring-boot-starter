@@ -29,7 +29,7 @@ public class SecurityConfig {
         return http
                 .authorizeHttpRequests(customizer -> customizer.anyRequest().authenticated())
                 .csrf(CsrfConfigurer::disable)
-                
+
                 // Add a JwtAuthenticationToken to the request to simulate using the JWT's subject
                 // claim as the principal in the FGA check.
                 // NOTE: This does NOT provide any JWT-based security - a real application would

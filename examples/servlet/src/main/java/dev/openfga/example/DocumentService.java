@@ -5,6 +5,7 @@ import dev.openfga.sdk.api.client.model.ClientTupleKey;
 import dev.openfga.sdk.api.client.model.ClientWriteRequest;
 import dev.openfga.sdk.errors.FgaInvalidParameterException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -50,7 +51,7 @@ public class DocumentService {
         // write to fga
         ClientWriteRequest writeRequest = new ClientWriteRequest()
                 .writes(List.of(new ClientTupleKey()
-                        .user("user:anne")
+                        .user(String.format("user:%s", SecurityContextHolder.getContext().getAuthentication().getName()))
                         .relation("owner")
                         ._object(String.format("document:%s", document.id()))));
 
