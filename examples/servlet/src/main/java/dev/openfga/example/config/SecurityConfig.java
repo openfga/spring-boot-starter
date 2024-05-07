@@ -22,6 +22,10 @@ import java.time.temporal.ChronoUnit;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    // For example/testing purposes, we are using a hard-coded JWT here to simulate
+    // a JWT-based authentication, and the FGA check will (by default) use the subject
+    // claim as the user ID. In a real application, you would configure JWT-based authorization
+    // through Spring's OAuth Resource Server configuration.
     private static final String TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3Rlc3QuYXV0aDAuY29tLyIsInN1YiI6ImFubmUiLCJhdWQiOiJodHRwczovL3F1aWNrc3RhcnRzL2FwaSIsImlhdCI6MTcxNDY1NzE5OCwiZXhwIjoxNzE0NzQzNTk4fQ.wbpLJa5Q1196V2Of--XuvGc-ONHNZOZTSrwWLoD3isQ";
 
     @Bean
