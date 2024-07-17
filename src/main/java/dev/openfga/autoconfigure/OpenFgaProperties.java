@@ -9,10 +9,24 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "openfga")
 public class OpenFgaProperties implements InitializingBean {
 
+    /**
+     * URL to OpenFGA instance.
+     * If configured, beans will be initialized.
+     */
     private String apiUrl;
+    /**
+     * The ID of the store to use.
+     */
     private String storeId;
+
+    /**
+     * The ID of the authorization model to use.
+     */
     private String authorizationModelId;
 
+    /**
+     * The credentials for the OpenFGA client.
+     */
     private Credentials credentials;
 
     public String getApiUrl() {
@@ -88,7 +102,13 @@ public class OpenFgaProperties implements InitializingBean {
      */
     public static class Credentials {
 
+        /**
+         * The authentication method to use for the OpenFGA client.
+         */
         private CredentialsMethod method;
+        /**
+         * Authentication config for the OpenFGA client.
+         */
         private CredentialsConfiguration config;
 
         public CredentialsMethod getMethod() {
@@ -136,12 +156,36 @@ public class OpenFgaProperties implements InitializingBean {
      * {@link dev.openfga.sdk.api.client.OpenFgaClient} credentials configuration properties
      */
     public static class CredentialsConfiguration {
+        /**
+         * The API token used to authenticate the client at OpenFGA.
+         * Required, if {@code API_TOKEN} method should be used.
+         */
         private String apiToken;
+        /**
+         * The API token issuer, used as an additional check.
+         * Required, if {@code CLIENT_CREDENTIALS} method should be used.
+         */
         private String apiTokenIssuer;
+        /**
+         * The API audience.
+         * If configured and if {@code CLIENT_CREDENTIALS} is used,
+         * the client will use this audience to obtain an access token.
+         */
         private String apiAudience;
+        /**
+         * The OAuth2 client ID.
+         * Required, if {@code CLIENT_CREDENTIALS} method should be used.
+         */
         private String clientId;
+        /**
+         * The OAuth2 client secret.
+         * Required, if {@code CLIENT_CREDENTIALS} method should be used.
+         */
         private String clientSecret;
-
+        /**
+         * Space seperated list of OAuth2 scopes used to
+         * obtain an access token.
+         */
         private String scopes;
 
         public String getApiTokenIssuer() {
