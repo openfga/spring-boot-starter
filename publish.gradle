@@ -1,3 +1,6 @@
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
 publishing {
     publications {
         maven(MavenPublication) {
@@ -5,9 +8,8 @@ publishing {
 
             pom {
                 group = 'dev.openfga'
-                name = 'openfga-spring-boot-starter'
                 version = '0.0.1'
-                description = 'This is the Spring Boot Starter for OpenFGA.'
+
                 url = 'https://openfga.dev'
                 licenses {
                     license {
@@ -46,15 +48,4 @@ signing {
     def signingPassword = System.getenv('ORG_GRADLE_PROJECT_SIGNINGPASSWORD')
     useInMemoryPgpKeys(signingKey, signingPassword)
     sign publishing.publications.maven
-}
-
-nexusPublishing {
-    repositories {
-        sonatype {
-            nexusUrl.set(uri('https://s01.oss.sonatype.org/service/local/'))
-            snapshotRepositoryUrl.set(uri('https://s01.oss.sonatype.org/content/repositories/snapshots/'))
-            username.set(System.getenv('MAVEN_USERNAME'))
-            password.set(System.getenv('MAVEN_PASSWORD'))
-        }
-    }
 }

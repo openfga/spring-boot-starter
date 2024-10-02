@@ -1,85 +1,87 @@
 plugins {
-    id 'java-library'
-    id 'org.springframework.boot' version "${springBootVersion}" apply false
+    id 'java'
     id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
 
     // quality
-    id 'com.diffplug.spotless' version '6.25.0'
-    id 'jacoco'
+    id 'com.diffplug.spotless' version '6.25.0' apply false
 
     // Publishing
-    id 'maven-publish'
-    id 'signing'
     id 'io.github.gradle-nexus.publish-plugin' version '1.3.0'
 }
 
-apply from: 'publish.gradle'
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'java-library'
+    apply plugin: 'io.spring.dependency-management'
 
-group = 'dev.openfga'
-version = '0.0.1'
+    // quality
+    apply plugin: 'com.diffplug.spotless'
+    apply plugin: 'jacoco'
 
-java {
-    sourceCompatibility = 17
-    targetCompatibility = 17
+    apply from: "$rootDir/publish.gradle"
 
-    withJavadocJar()
-    withSourcesJar()
-}
+    group = 'dev.openfga'
+    version = '0.0.1'
 
-repositories {
-    mavenCentral()
-}
-
-dependencyManagement {
-    imports {
-        mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
-    }
-}
-
-dependencies {
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-
-    implementation 'org.springframework.boot:spring-boot'
-    implementation 'org.springframework.boot:spring-boot-autoconfigure'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-
-    api 'dev.openfga:openfga-sdk:0.4.0'
-
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'org.hamcrest:hamcrest:2.2'
-    testImplementation 'org.mockito:mockito-core:5.11.0'
-}
-
-test {
-    useJUnitPlatform()
-}
-
-spotless {
-    format 'misc', {
-        // define the files (e.g. '*.gradle', '*.md') to apply `misc` to
-        target '.gitignore', '*.gradle'
-        // define the steps to apply to those files
-        trimTrailingWhitespace()
-        indentWithSpaces()
-        endWithNewline()
-    }
     java {
-        palantirJavaFormat()
-        removeUnusedImports()
-        importOrder()
+        sourceCompatibility = 17
+        targetCompatibility = 17
+
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+        }
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+    spotless {
+        format 'misc', {
+            // define the files (e.g. '*.gradle', '*.md') to apply `misc` to
+            target '.gitignore', '*.gradle'
+            // define the steps to apply to those files
+            trimTrailingWhitespace()
+            indentWithSpaces()
+            endWithNewline()
+        }
+        java {
+            palantirJavaFormat()
+            removeUnusedImports()
+            importOrder()
+        }
+    }
+
+    test {
+        finalizedBy jacocoTestReport // report is always generated after tests run
+    }
+
+    jacocoTestReport {
+        // tests are required to run before generating a JaCoCo coverage report.
+        dependsOn test
+    }
+
+    tasks.register('fmt') {
+        dependsOn 'spotlessApply'
     }
 }
 
-test {
-    finalizedBy jacocoTestReport // report is always generated after tests run
-}
-
-jacocoTestReport {
-    // tests are required to run before generating a JaCoCo coverage report.
-    dependsOn test
-}
-
-tasks.register('fmt') {
-    dependsOn 'spotlessApply'
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(uri('https://s01.oss.sonatype.org/service/local/'))
+            snapshotRepositoryUrl.set(uri('https://s01.oss.sonatype.org/content/repositories/snapshots/'))
+            username.set(System.getenv('MAVEN_USERNAME'))
+            password.set(System.getenv('MAVEN_PASSWORD'))
+        }
+    }
 }
