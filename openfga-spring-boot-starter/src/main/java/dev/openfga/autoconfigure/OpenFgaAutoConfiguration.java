@@ -21,18 +21,18 @@ import org.springframework.context.annotation.Bean;
 @EnableConfigurationProperties(OpenFgaProperties.class)
 public class OpenFgaAutoConfiguration {
 
-    private final OpenFgaProperties openFgaProperties;
-
-    public OpenFgaAutoConfiguration(OpenFgaProperties openFgaProperties) {
-        this.openFgaProperties = openFgaProperties;
+    @Bean
+    @ConditionalOnMissingBean(OpenFgaConnectionDetails.class)
+    PropertiesOpenFgaConnectionDetails openFgaConnectionDetails(OpenFgaProperties openFgaProperties) {
+        return new PropertiesOpenFgaConnectionDetails(openFgaProperties);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public ClientConfiguration fgaConfig() {
+    public ClientConfiguration fgaConfig(OpenFgaProperties properties, OpenFgaConnectionDetails connectionDetails) {
         var credentials = new Credentials();
 
-        var credentialsProperties = openFgaProperties.getCredentials();
+        var credentialsProperties = properties.getCredentials();
 
         if (credentialsProperties != null) {
             if (OpenFgaProperties.CredentialsMethod.API_TOKEN.equals(credentialsProperties.getMethod())) {
@@ -54,9 +54,9 @@ public class OpenFgaAutoConfiguration {
         }
 
         return new ClientConfiguration()
-                .apiUrl(openFgaProperties.getApiUrl())
-                .storeId(openFgaProperties.getStoreId())
-                .authorizationModelId(openFgaProperties.getAuthorizationModelId())
+                .apiUrl(connectionDetails.getApiUrl())
+                .storeId(properties.getStoreId())
+                .authorizationModelId(properties.getAuthorizationModelId())
                 .credentials(credentials);
     }
 
@@ -74,5 +74,19 @@ public class OpenFgaAutoConfiguration {
     @ConditionalOnMissingBean
     public OpenFga fga(OpenFgaClient openFgaClient) {
         return new OpenFga(openFgaClient);
+    }
+
+    static class PropertiesOpenFgaConnectionDetails implements OpenFgaConnectionDetails {
+
+        private final OpenFgaProperties openFgaProperties;
+
+        public PropertiesOpenFgaConnectionDetails(OpenFgaProperties openFgaProperties) {
+            this.openFgaProperties = openFgaProperties;
+        }
+
+        @Override
+        public String getApiUrl() {
+            return this.openFgaProperties.getApiUrl();
+        }
     }
 }
