@@ -14,18 +14,9 @@ To use a different FGA server, update `src/main/resources/application.yaml` acco
 
 ## Usage
 
-### Start OpenFGA server
-
-In a terminal, start the OpenFGA Server:
-
-```bash
-docker pull openfga/openfga:latest
-docker run --rm -e OPENFGA_HTTP_ADDR=0.0.0.0:4000 -p 4000:4000 -p 8081:8081 -p 3000:3000 openfga/openfga run
-```
-
 ### Start the example application:
 
-In a separate terminal, start the application:
+In a terminal, start the application:
 
 ```bash
 ./gradlew bootRun
