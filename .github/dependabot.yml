@@ -6,9 +6,17 @@ updates:
       interval: "daily"
 
   - package-ecosystem: "gradle"
-    directory: "openfga-spring-boot-starter"
+    directory: "/"
     schedule:
-      interval: "daily"
+      interval: "monthly"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "gradle"
+    directory: "/examples/servlet"
+    schedule:
+      interval: "monthly"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
