@@ -45,6 +45,10 @@ dependencies {
 
     api 'dev.openfga:openfga-sdk:0.7.2'
 
+    compileOnly 'com.fasterxml.jackson.core:jackson-databind'
+    compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    compileOnly 'org.openapitools:jackson-databind-nullable:0.2.6'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.hamcrest:hamcrest:2.2'
@@ -68,6 +72,10 @@ spotless {
         palantirJavaFormat()
         removeUnusedImports()
         importOrder()
+    }
+    flexmark {
+        target "*.md"
+        flexmark()
     }
 }
 

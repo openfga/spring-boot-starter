@@ -26,7 +26,11 @@ public class OpenFga {
 
     private final OpenFgaClient fgaClient;
 
-    // Inject OpenFga client
+    /**
+     * Create a new OpenFGA instance.
+     *
+     * @param fgaClient The OpenFGA client to use
+     */
     public OpenFga(OpenFgaClient fgaClient) {
         this.fgaClient = fgaClient;
     }
