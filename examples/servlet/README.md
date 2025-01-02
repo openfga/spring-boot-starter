@@ -16,9 +16,15 @@ To use a different FGA server, update `src/main/resources/application.yaml` acco
 
 ### Start the example application:
 
+To run a local OpenFGA instance, you can use the provided `docker-compose.yml` file:
+
+```shell
+docker-compose up -d
+```
+
 In a terminal, start the application:
 
-```bash
+```shell
 ./gradlew bootRun
 ```
 
@@ -46,7 +52,7 @@ You should receive a 200 response with the document:
 
 Execute a request for document 2, for which user `anne` does **not** have viewer access to:
 
-```bash
+```shell
 curl http://localhost:8080/documents/2
 ```
 
@@ -54,7 +60,7 @@ You should receive a 403 response, as user `anne` does not have the required rel
 
 You can also create a document, for which user `anne` will be granted the owner relation for the document:
 
-```bash
+```shell
 curl -d '{"id": "10", "content": "new document content"}' -H 'Content-Type: application/json' http://localhost:8080/documents
 ```
 
@@ -64,7 +70,7 @@ To run the example using a non-published version of the Okta FGA Spring Boot Sta
 
 In the root directory of this repository, run:
 
-```bash
+```shell
 ./gradlew assemble publishToMavenLocal
 ```
 

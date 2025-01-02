@@ -22,7 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 @ExtendWith(MockitoExtension.class)
-public class OpenFgaTest {
+class OpenFgaTest {
 
     @Mock
     private OpenFgaClient mockClient;
@@ -34,7 +34,7 @@ public class OpenFgaTest {
     private ClientCheckResponse mockCheckResponse;
 
     @Test
-    public void fgaCheckCalled() throws Exception {
+    void fgaCheckCalled() throws Exception {
         // given
         OpenFga openFga = new OpenFga(mockClient);
         when(mockCheckResponseFuture.get()).thenReturn(mockCheckResponse);
@@ -56,7 +56,7 @@ public class OpenFgaTest {
     }
 
     @Test
-    public void usesPrincipalNameAsUserId() throws Exception {
+    void usesPrincipalNameAsUserId() throws Exception {
         // given
         Principal principal = () -> "userId";
         Authentication auth = new UsernamePasswordAuthenticationToken(principal, null);
@@ -82,7 +82,7 @@ public class OpenFgaTest {
     }
 
     @Test
-    public void failsWhenNoUserIdSpecifiedAndNotFoundInContext() throws Exception {
+    void failsWhenNoUserIdSpecifiedAndNotFoundInContext() throws Exception {
         // given
         OpenFga openFga = new OpenFga(mockClient);
 
@@ -95,7 +95,7 @@ public class OpenFgaTest {
     }
 
     @Test
-    public void failsWhenCheckHasException() throws Exception {
+    void failsWhenCheckHasException() throws Exception {
         // given
         OpenFga openFga = new OpenFga(mockClient);
 
