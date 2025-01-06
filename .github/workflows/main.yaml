@@ -52,11 +52,12 @@ jobs:
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@f9c9c575b8b21b6485636a91ffecd10e558c62f6 # v3.5.0
 
-      - name: Publish package
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@0bdd871935719febd78681f197cd39af5b6e16a6 # v4.2.2
-        with:
-          # Tasks created by https://github.com/gradle-nexus/publish-plugin
-          arguments: publishToSonatype closeAndReleaseSonatypeStagingRepository
+
+      - name: Publish package
+        # Tasks created by https://github.com/gradle-nexus/publish-plugin
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
@@ -84,11 +85,12 @@ jobs:
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@f9c9c575b8b21b6485636a91ffecd10e558c62f6 # v3.5.0
 
-      - name: Publish package
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@0bdd871935719febd78681f197cd39af5b6e16a6 # v4.2.2
-        with:
-          # Tasks created by https://docs.gradle.org/current/userguide/publishing_maven.html
-          arguments: publishAllPublicationsToGitHubPackagesRepository
+
+      - name: Publish package
+        # Tasks created by https://docs.gradle.org/current/userguide/publishing_maven.html
+        run: ./gradlew publishAllPublicationsToGitHubPackagesRepository
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ORG_GRADLE_PROJECT_SIGNINGKEY: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGKEY }}
