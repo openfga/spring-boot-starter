@@ -13,16 +13,15 @@ import dev.openfga.sdk.errors.FgaInvalidParameterException;
 import java.security.Principal;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-@ExtendWith(MockitoExtension.class)
+@UnitTest
 class OpenFgaTest {
+    private final OpenFgaExceptionHandler exceptionHandler = new OpenFgaExceptionHandler();
 
     @Mock
     private OpenFgaClient mockClient;
@@ -35,8 +34,9 @@ class OpenFgaTest {
 
     @Test
     void fgaCheckCalled() throws Exception {
+
         // given
-        OpenFga openFga = new OpenFga(mockClient);
+        OpenFga openFga = new OpenFga(mockClient, exceptionHandler);
         when(mockCheckResponseFuture.get()).thenReturn(mockCheckResponse);
         when(mockClient.check(any(ClientCheckRequest.class))).thenReturn(mockCheckResponseFuture);
 
@@ -62,7 +62,7 @@ class OpenFgaTest {
         Authentication auth = new UsernamePasswordAuthenticationToken(principal, null);
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        OpenFga openFga = new OpenFga(mockClient);
+        OpenFga openFga = new OpenFga(mockClient, exceptionHandler);
         when(mockCheckResponseFuture.get()).thenReturn(mockCheckResponse);
         when(mockClient.check(any(ClientCheckRequest.class))).thenReturn(mockCheckResponseFuture);
 
@@ -82,9 +82,9 @@ class OpenFgaTest {
     }
 
     @Test
-    void failsWhenNoUserIdSpecifiedAndNotFoundInContext() throws Exception {
+    void failsWhenNoUserIdSpecifiedAndNotFoundInContext() {
         // given
-        OpenFga openFga = new OpenFga(mockClient);
+        OpenFga openFga = new OpenFga(mockClient, exceptionHandler);
 
         // when/then
         IllegalStateException exception =
@@ -97,14 +97,14 @@ class OpenFgaTest {
     @Test
     void failsWhenCheckHasException() throws Exception {
         // given
-        OpenFga openFga = new OpenFga(mockClient);
+        OpenFga openFga = new OpenFga(mockClient, exceptionHandler);
 
         // when
         when(mockClient.check(any(ClientCheckRequest.class))).thenThrow(FgaInvalidParameterException.class);
 
         // then
-        OpenFgaCheckException exception = assertThrows(
-                OpenFgaCheckException.class, () -> openFga.check("document", "docId", "viewer", "user", "userId"));
+        OpenFgaException exception = assertThrows(
+                OpenFgaException.class, () -> openFga.check("document", "docId", "viewer", "user", "userId"));
         assertThat(exception.getMessage(), is("Error performing FGA check"));
         assertThat(exception.getCause(), is(instanceOf(FgaInvalidParameterException.class)));
     }

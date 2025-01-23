@@ -43,16 +43,16 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-autoconfigure'
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
-    api 'dev.openfga:openfga-sdk:0.7.2'
+    api "dev.openfga:openfga-sdk:${openfgaSdkVersion}"
 
     compileOnly 'com.fasterxml.jackson.core:jackson-databind'
     compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-    compileOnly 'org.openapitools:jackson-databind-nullable:0.2.6'
+    compileOnly "org.openapitools:jackson-databind-nullable:${jacksonDatabindNullableVersion}"
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'org.hamcrest:hamcrest:2.2'
-    testImplementation 'org.mockito:mockito-core:5.15.2'
+    testImplementation 'org.hamcrest:hamcrest'
+    testImplementation 'org.mockito:mockito-core'
 }
 
 test {
