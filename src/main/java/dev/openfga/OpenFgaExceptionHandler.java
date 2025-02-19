@@ -60,9 +60,7 @@ public class OpenFgaExceptionHandler {
     }
 
     private static Throwable getRootCause(Throwable throwable) {
-        requireNonNull(throwable);
-
-        var rootCause = throwable;
+        var rootCause = requireNonNull(throwable);
         while ((rootCause.getCause() != null) && !Objects.equals(rootCause.getCause(), rootCause)) {
             rootCause = rootCause.getCause();
         }
