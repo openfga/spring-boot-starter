@@ -43,7 +43,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-autoconfigure'
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
-    api 'dev.openfga:openfga-sdk:0.7.2'
+    api 'dev.openfga:openfga-sdk:0.8.1'
 
     compileOnly 'com.fasterxml.jackson.core:jackson-databind'
     compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
