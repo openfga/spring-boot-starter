@@ -30,7 +30,8 @@ public class OpenFgaExceptionHandler {
      *
      * @param cause the throwable instance representing the root cause of the error
      * @param message the error message describing the context or details of the exception
-     * @param args optional arguments to format the error message
+     * @param args optional arguments to format the error message, String.format() like patterns
+     *             need to be applied to the message text then
      *
      * @return an instance of {@link OpenFgaException} with detailed contextual information
      */

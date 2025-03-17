@@ -305,7 +305,8 @@ public Document createDoc(String id) {
         // Option 2: use the exception handler provided by the starter
         // the exception handler is available as autoconfigured bean
         // do whatever you need with it log, throw, ...
-        throw exceptionHandler.handle(cause, "Error creating doc", id);
+        // params follow the String.format() patterns
+        throw exceptionHandler.handle(cause, "Error creating doc '%s'", id);
     }
 }
 ```
