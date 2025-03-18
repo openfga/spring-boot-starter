@@ -79,7 +79,7 @@ public class OpenFgaException extends RuntimeException {
                     .append("audience", getFgaError().getAudience())
                     .append("grantType", getFgaError().getGrantType())
                     .append("clientId", getFgaError().getClientId())
-                    .append("apiErrorCode", getFgaError().getRequestId())
+                    .append("requestId", getFgaError().getRequestId())
                     .append("responseData", getFgaError().getResponseData());
         }
 
