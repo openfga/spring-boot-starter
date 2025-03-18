@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import dev.openfga.OpenFga;
+import dev.openfga.OpenFgaExceptionHandler;
 import dev.openfga.sdk.api.client.ApiClient;
 import dev.openfga.sdk.api.client.OpenFgaClient;
 import dev.openfga.sdk.api.configuration.*;
@@ -44,8 +45,8 @@ public class OpenFgaAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public ClientConfiguration fgaConfig(OpenFgaProperties openFgaProperties) {
-        ClientConfiguration clientConfiguration = new ClientConfiguration();
-        PropertyMapper map = PropertyMapper.get();
+        var clientConfiguration = new ClientConfiguration();
+        var map = PropertyMapper.get();
         map.from(openFgaProperties::getCredentials)
                 .whenNonNull()
                 .as(OpenFgaAutoConfiguration::toCredentials)
@@ -69,13 +70,13 @@ public class OpenFgaAutoConfiguration {
     }
 
     private static Credentials toCredentials(OpenFgaProperties.Credentials credentialsProperties) {
-        Credentials credentials = new Credentials();
+        var credentials = new Credentials();
         if (OpenFgaProperties.CredentialsMethod.API_TOKEN == credentialsProperties.getMethod()) {
             credentials.setCredentialsMethod(CredentialsMethod.API_TOKEN);
             credentials.setApiToken(
                     new ApiToken(credentialsProperties.getConfig().getApiToken()));
         } else if (OpenFgaProperties.CredentialsMethod.CLIENT_CREDENTIALS == credentialsProperties.getMethod()) {
-            ClientCredentials clientCredentials = new ClientCredentials()
+            var clientCredentials = new ClientCredentials()
                     .clientId(credentialsProperties.getConfig().getClientId())
                     .clientSecret(credentialsProperties.getConfig().getClientSecret())
                     .apiTokenIssuer(credentialsProperties.getConfig().getApiTokenIssuer())
@@ -143,10 +144,10 @@ public class OpenFgaAutoConfiguration {
             ObjectProvider<ObjectMapper> objectMapperProvider,
             HttpClientBuilderCustomizer httpClientBuilderCustomizer) {
 
-        if (httpClientBuilderProvider.getIfAvailable() == null && objectMapperProvider.getIfAvailable() == null) {
+        if ((httpClientBuilderProvider.getIfAvailable() == null) && (objectMapperProvider.getIfAvailable() == null)) {
             return new ApiClient();
         }
-        HttpClient.Builder httpClientBuilder = httpClientBuilderProvider.getIfAvailable(HttpClient::newBuilder);
+        var httpClientBuilder = httpClientBuilderProvider.getIfAvailable(HttpClient::newBuilder);
         httpClientBuilderCustomizer.customize(httpClientBuilder);
         return new ApiClient(
                 httpClientBuilder,
@@ -154,7 +155,7 @@ public class OpenFgaAutoConfiguration {
     }
 
     private static ObjectMapper createDefaultObjectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
+        var mapper = new ObjectMapper();
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
@@ -185,14 +186,28 @@ public class OpenFgaAutoConfiguration {
     }
 
     /**
+     * Provides a bean for handling exceptions related to OpenFGA operations. If no other bean of this type is
+     * present, this method initializes and returns an {@link OpenFgaExceptionHandler} instance.
+     *
+     * @return an {@link OpenFgaExceptionHandler} instance for handling OpenFGA-related exceptions
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public OpenFgaExceptionHandler openFgaExceptionHandler() {
+        return new OpenFgaExceptionHandler();
+    }
+
+    /**
      * Creates an {@link OpenFga} bean if no other bean of this type is present.
      *
      * @param openFgaClient the {@link OpenFgaClient} bean
+     * @param openFgaExceptionHandler the {@link  OpenFgaExceptionHandler} bean
+     *
      * @return the {@link OpenFga} bean
      */
     @Bean
     @ConditionalOnMissingBean
-    public OpenFga fga(OpenFgaClient openFgaClient) {
-        return new OpenFga(openFgaClient);
+    public OpenFga fga(OpenFgaClient openFgaClient, OpenFgaExceptionHandler openFgaExceptionHandler) {
+        return new OpenFga(openFgaClient, openFgaExceptionHandler);
     }
 }

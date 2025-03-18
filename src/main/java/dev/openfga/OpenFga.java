@@ -4,35 +4,34 @@ import dev.openfga.sdk.api.client.OpenFgaClient;
 import dev.openfga.sdk.api.client.model.ClientCheckRequest;
 import dev.openfga.sdk.errors.FgaInvalidParameterException;
 import java.util.concurrent.ExecutionException;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 
 /**
- * A bean that can be used to perform common FGA tasks, such as execute a check request.
+ * A bean that can be used to perform common FGA tasks, such as execute a check request.<br/>
  *
  * Can be used in {@code @PreAuthorize} or {@code PostAuthorize} to provide method-level FGA
- * protection for a requested resource. For example:
+ * protection for a requested resource.<br/><br/>For example:
  * <pre>
- *
- * {@code @PreAuthorize("@openFga.check('document', #id, 'reader', 'user', 'authentication?.name')")}
+ * {@code @PreAuthorize("@openFga.check('document', #id, 'reader', 'user', 'authentication?.name')")
  * public Document getDocument(String id) {
  *     repository.findById(id);
- * }
+ * }}
  * </pre>
  */
-@Component
 public class OpenFga {
 
     private final OpenFgaClient fgaClient;
+    private final OpenFgaExceptionHandler exceptionHandler;
 
     /**
      * Create a new OpenFGA instance.
      *
-     * @param fgaClient The OpenFGA client to use
+     * @param fgaClient The {@link OpenFgaClient} to use
+     * @param exceptionHandler The {@link OpenFgaExceptionHandler} to use
      */
-    public OpenFga(OpenFgaClient fgaClient) {
+    public OpenFga(OpenFgaClient fgaClient, OpenFgaExceptionHandler exceptionHandler) {
         this.fgaClient = fgaClient;
+        this.exceptionHandler = exceptionHandler;
     }
 
     /**
@@ -48,7 +47,7 @@ public class OpenFga {
      * @see <a href="https://openfga.dev/api/service#/Relationship%20Queries/Check">FGA Check API</a>
      */
     public boolean check(String objectType, String objectId, String relation, String userType) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             throw new IllegalStateException(
                     "No user provided, and no authentication could be found in the security context");
@@ -74,11 +73,10 @@ public class OpenFga {
                 .user(String.format("%s:%s", userType, userId))
                 .relation(relation)
                 ._object(String.format("%s:%s", objectType, objectId));
-
         try {
             return Boolean.TRUE.equals(fgaClient.check(body).get().getAllowed());
-        } catch (InterruptedException | FgaInvalidParameterException | ExecutionException e) {
-            throw new OpenFgaCheckException("Error performing FGA check", e);
+        } catch (InterruptedException | FgaInvalidParameterException | ExecutionException cause) {
+            throw exceptionHandler.handle(cause, "Error performing FGA check");
         }
     }
 }

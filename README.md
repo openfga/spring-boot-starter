@@ -285,6 +285,10 @@ public class MyService {
 This can be used to interact with the FGA API, for example to write authorization data:
 
 ```java
+// field injection just for briefness
+@Autowired
+private OpenFgaExceptionHandler exceptionHandler;
+
 public Document createDoc(String id) {
     // ...
     ClientWriteRequest writeRequest = new ClientWriteRequest().writes(List.of(new ClientTupleKey()
@@ -294,10 +298,16 @@ public Document createDoc(String id) {
 
     try {
         fgaClient.write(writeRequest).get();
-    } catch (InterruptedException | ExecutionException | FgaInvalidParameterException e) {
-        throw new RuntimeException("Error writing to FGA", e);
+    } catch (final InterruptedException | ExecutionException | FgaInvalidParameterException cause) {
+        // Option 1: use your custom exception handling for the native exception thrown from the client
+        // throw new RuntimeException("Error writing to FGA", cause);
+      
+        // Option 2: use the exception handler provided by the starter
+        // the exception handler is available as autoconfigured bean
+        // do whatever you need with it log, throw, ...
+        // params follow the String.format() patterns
+        throw exceptionHandler.handle(cause, "Error creating doc '%s'", id);
     }
-    // ...
 }
 ```
 
