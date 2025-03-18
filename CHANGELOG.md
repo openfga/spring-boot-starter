@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.2.0
+
+### [0.2.0](https://github.com/openfga/spring-boot-starter/releases/tag/v0.2.0) (2025-03-18)
+
+- feat: improved error handling (#90) - thanks to @holgerstolzenberg for this!
+- feat(deps)!: update java SDK version (#94)
+
+> [!WARNING]  
+> This version includes version 0.8.1 of the [OpenFGA Java SDK](https://github.com/openfga/java-sdk/), which contains breaking changes to the OpenFGA Java SDK related to the SDK's batch check implementation. Please see #94 for additional information.
+
 ## v0.1.0
 
 ### [0.1.0](https://github.com/openfga/spring-boot-starter/releases/tag/v0.1.0) (2025-01-03)
