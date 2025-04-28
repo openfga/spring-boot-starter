@@ -66,7 +66,7 @@ curl -d '{"id": "10", "content": "new document content"}' -H 'Content-Type: appl
 
 ## Using example with local unpublished starter
 
-To run the example using a non-published version of the Okta FGA Spring Boot Starter, first publish the starter to your local maven repository.
+To run the example using a non-published version of the Auth0 FGA Spring Boot Starter, first publish the starter to your local maven repository.
 
 In the root directory of this repository, run:
 
