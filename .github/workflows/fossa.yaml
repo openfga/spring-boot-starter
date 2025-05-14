@@ -23,13 +23,13 @@ jobs:
         run: ./gradlew build
 
       - name: Run FOSSA scan and upload build data
-        uses: fossas/fossa-action@c0a7d013f84c8ee5e910593186598625513cc1e4 # main
+        uses: fossas/fossa-action@3ebcea1862c6ffbd5cf1b4d0bd6b3fe7bd6f2cac # main
         with:
           api-key: ${{ secrets.FOSSA_API_KEY }}
           branch: ${{ github.ref_name }}
 
       - name: Run FOSSA tests
-        uses: fossas/fossa-action@c0a7d013f84c8ee5e910593186598625513cc1e4 # main
+        uses: fossas/fossa-action@3ebcea1862c6ffbd5cf1b4d0bd6b3fe7bd6f2cac # main
         with:
           api-key: ${{ secrets.FOSSA_API_KEY }}
           run-tests: true
