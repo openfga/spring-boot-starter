@@ -59,10 +59,10 @@ jobs:
         # Tasks created by https://github.com/gradle-nexus/publish-plugin
         run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
         env:
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-          ORG_GRADLE_PROJECT_SIGNINGKEY: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGKEY }}
-          ORG_GRADLE_PROJECT_SIGNINGPASSWORD: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD }}
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+          ORG_GRADLE_PROJECT_SIGNINGKEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_SIGNINGPASSWORD: ${{ secrets.GPG_PASSPHRASE }}
 
   publish-github-packages:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -93,8 +93,8 @@ jobs:
         run: ./gradlew publishAllPublicationsToGitHubPackagesRepository
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ORG_GRADLE_PROJECT_SIGNINGKEY: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGKEY }}
-          ORG_GRADLE_PROJECT_SIGNINGPASSWORD: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD }}
+          ORG_GRADLE_PROJECT_SIGNINGKEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_SIGNINGPASSWORD: ${{ secrets.GPG_PASSPHRASE }}
 
   create-release:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -107,5 +107,8 @@ jobs:
       - uses: Roang-zero1/github-create-release-action@57eb9bdce7a964e48788b9e78b5ac766cb684803 # v3.0.1
         with:
           version_regex: ^v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+
+          prerelease_regex: ^v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+-(alpha|beta|preview)\.[[:digit:]]+$
+          changelog_file: CHANGELOG.md
+          create_draft: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
