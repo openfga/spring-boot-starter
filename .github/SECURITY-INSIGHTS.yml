@@ -14,11 +14,11 @@ repository:
   accepts-automated-change-request: true
   no-third-party-packages: false
   core-team:
-  - name: Jim Anderson
-    affiliation: Okta
-    email: jim.anderson@okta.com
-    social: https://github.com/jimmyjames
-    primary: true
+    - name: Jim Anderson
+      affiliation: Okta
+      email: jim.anderson@okta.com
+      social: https://github.com/jimmyjames
+      primary: true
 
   license:
     url: https://raw.githubusercontent.com/openfga/spring-boot-starter/main/LICENSE
