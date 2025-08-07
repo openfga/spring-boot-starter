@@ -10,6 +10,8 @@ jobs:
   test:
     name: Run Checks
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     strategy:
       matrix:
