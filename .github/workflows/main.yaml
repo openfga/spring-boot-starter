@@ -55,7 +55,7 @@ jobs:
         uses: gradle/wrapper-validation-action@f9c9c575b8b21b6485636a91ffecd10e558c62f6 # v3.5.0
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a # v4.4.3
+        uses: gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1 # v4.4.4
 
       - name: Publish package
         # Tasks created by https://github.com/gradle-nexus/publish-plugin
@@ -88,7 +88,7 @@ jobs:
         uses: gradle/wrapper-validation-action@f9c9c575b8b21b6485636a91ffecd10e558c62f6 # v3.5.0
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a # v4.4.3
+        uses: gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1 # v4.4.4
 
       - name: Publish package
         # Tasks created by https://docs.gradle.org/current/userguide/publishing_maven.html
