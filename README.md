@@ -112,7 +112,7 @@ openfga:
   store-id: YOUR_FGA_STORE_ID
   authorization-model-id: YOUR_FGA_AUTHORIZATION_MODEL_ID
   credentials:
-    method: CLIENT_CONFIGURATION # constant
+    method: CLIENT_CREDENTIALS # constant
     config:
       client-id: YOUR_CLIENT_ID
       client-secret: YOUR_CLIENT_SECRET
@@ -141,7 +141,7 @@ openfga:
   telemetry-configuration:
     fga_client_request_model_id: YOUR_FGA_CLIENT_REQUEST_MODEL_ID
   credentials:
-    method: CLIENT_CONFIGURATION # constant
+    method: CLIENT_CREDENTIALS # constant
     config:
       client-id: YOUR_CLIENT_ID
       client-secret: YOUR_CLIENT_SECRET
