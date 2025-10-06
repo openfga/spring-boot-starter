@@ -30,7 +30,7 @@ updates:
       prefix: "chore"
       include: "scope"
   - package-ecosystem: "gradle"
-    directory: "/"
+    directory: "/examples/servlet"
     schedule:
       interval: "weekly"
       day: "monday"
