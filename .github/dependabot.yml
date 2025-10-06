@@ -1,38 +1,47 @@
 # yaml-language-server: $schema=https://json.schemastore.org/dependabot-2.0.json
 version: 2
 updates:
-  - package-ecosystem: github-actions
-    directory: /
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
-      interval: weekly
-      day: monday
+      interval: "weekly"
+      day: "monday"
     groups:
       dependencies:
         patterns:
-          - '*'
-  - package-ecosystem: gradle
-    directory: /
+          - "*"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+  - package-ecosystem: "gradle"
+    directory: "/"
     schedule:
-      interval: weekly
-      day: monday
+      interval: "weekly"
+      day: "monday"
     groups:
       dependencies:
         patterns:
-          - '*'
+          - "*"
     ignore:
-      - dependency-name: '*'
+      - dependency-name: "*"
         update-types:
-          - 'version-update:semver-major'
-  - package-ecosystem: gradle
-    directory: /examples/servlet
+          - "version-update:semver-major"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+  - package-ecosystem: "gradle"
+    directory: "/"
     schedule:
-      interval: weekly
-      day: monday
+      interval: "weekly"
+      day: "monday"
     groups:
       dependencies:
         patterns:
-          - '*'
+          - "*"
     ignore:
-      - dependency-name: '*'
+      - dependency-name: "*"
         update-types:
-          - 'version-update:semver-major'
+          - "version-update:semver-major"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
