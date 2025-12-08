@@ -1,7 +1,6 @@
 # OpenFGA Spring Boot Starter
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopenfga%2Ffga-spring-boot.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopenfga%2Ffga-spring-boot?ref=badge_shield)
 [![Join our community](https://img.shields.io/badge/slack-cncf_%23openfga-40abb8.svg?logo=slack)](https://openfga.dev/community)
 [![Twitter](https://img.shields.io/twitter/follow/openfga?color=%23179CF0&logo=twitter&style=flat-square "@openfga on Twitter")](https://twitter.com/openfga)
 
