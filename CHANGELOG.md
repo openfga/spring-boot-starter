@@ -4,7 +4,7 @@
 
 ### [0.3.0](https://github.com/openfga/spring-boot-starter/releases/tag/v0.3.0) (2025-12-15)
 
-- feat: improved error handling 
+- feat: improved error handling
 - chore: update dependencies
 
 ## v0.2.0
