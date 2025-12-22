@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.5.8'
+    id 'org.springframework.boot' version '3.5.9'
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -22,5 +22,5 @@ dependencies {
     implementation 'dev.openfga:openfga-spring-boot-starter:0.3.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-    testImplementation 'org.testcontainers:openfga:1.21.3'
+    testImplementation 'org.testcontainers:openfga:1.21.4'
 }
