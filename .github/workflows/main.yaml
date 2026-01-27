@@ -17,6 +17,11 @@ jobs:
       matrix:
         java: [17, 21]
 
+    # Global Env to fix the ETIMEDOUT / ENETUNREACH issues
+    env:
+      _JAVA_OPTIONS: "-Djava.net.preferIPv4Stack=true"
+      NODE_OPTIONS: "--dns-result-order=ipv4first"
+
     steps:
       - name: Checkout the source
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
