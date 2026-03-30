@@ -34,6 +34,12 @@ dependencyManagement {
     imports {
         mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
     }
+    dependencies {
+        // Spring Boot 3.4.x manages Mockito 5.14.x which uses byte-buddy 1.14.x.
+        // Java 25 support requires byte-buddy 1.15.x, available from Mockito 5.15+.
+        dependency 'org.mockito:mockito-core:5.22.0'
+        dependency 'org.mockito:mockito-junit-jupiter:5.22.0'
+    }
 }
 
 dependencies {
