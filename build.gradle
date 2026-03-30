@@ -39,8 +39,6 @@ dependencyManagement {
         // Java 25 support requires byte-buddy 1.15.x, available from Mockito 5.15+.
         dependency 'org.mockito:mockito-core:5.22.0'
         dependency 'org.mockito:mockito-junit-jupiter:5.22.0'
-        dependency 'net.bytebuddy:byte-buddy:1.15.11'
-        dependency 'net.bytebuddy:byte-buddy-agent:1.15.11'
     }
 }
 
@@ -62,6 +60,11 @@ dependencies {
     testImplementation 'org.hamcrest:hamcrest'
     testImplementation 'org.mockito:mockito-core'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+configurations.all {
+    resolutionStrategy.force 'net.bytebuddy:byte-buddy:1.15.11',
+            'net.bytebuddy:byte-buddy-agent:1.15.11'
 }
 
 test {
