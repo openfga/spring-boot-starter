@@ -158,14 +158,16 @@ class OpenFgaAutoConfigurationTests {
 
     @Test
     void failsIfApiTokenMethodSetButNoToken() {
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> contextRunner
-                .withPropertyValues(
-                        "openfga.api-url=https://api.fga.example",
-                        "openfga.authorization-model-id=authorization model ID",
-                        "openfga.store-id=store ID",
-                        "openfga.credentials.method=API_TOKEN")
-                .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
-                .run(context -> context.getBean("fgaConfig")));
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> contextRunner
+                        .withPropertyValues(
+                                "openfga.api-url=https://api.fga.example",
+                                "openfga.authorization-model-id=authorization model ID",
+                                "openfga.store-id=store ID",
+                                "openfga.credentials.method=API_TOKEN")
+                        .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
+                        .run(context -> context.getBean("fgaConfig")));
 
         assertThat(
                 exception.getCause().getMessage(),
@@ -174,14 +176,16 @@ class OpenFgaAutoConfigurationTests {
 
     @Test
     void failsIfClientCredentialsMethodSetButNotConfigured() {
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> contextRunner
-                .withPropertyValues(
-                        "openfga.api-url=https://api.fga.example",
-                        "openfga.authorization-model-id=authorization model ID",
-                        "openfga.store-id=store ID",
-                        "openfga.credentials.method=CLIENT_CREDENTIALS")
-                .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
-                .run(context -> context.getBean("fgaConfig")));
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> contextRunner
+                        .withPropertyValues(
+                                "openfga.api-url=https://api.fga.example",
+                                "openfga.authorization-model-id=authorization model ID",
+                                "openfga.store-id=store ID",
+                                "openfga.credentials.method=CLIENT_CREDENTIALS")
+                        .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
+                        .run(context -> context.getBean("fgaConfig")));
 
         assertThat(
                 exception.getCause().getMessage(),
@@ -191,97 +195,111 @@ class OpenFgaAutoConfigurationTests {
 
     @Test
     void failsIfCredentialsWithNoMethod() {
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> contextRunner
-                .withPropertyValues(
-                        "openfga.api-url=https://api.fga.example",
-                        "openfga.authorization-model-id=authorization model ID",
-                        "openfga.store-id=store ID",
-                        "openfga.credentials.config.api-token=API_TOKEN")
-                .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
-                .run(context -> context.getBean("fgaConfig")));
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> contextRunner
+                        .withPropertyValues(
+                                "openfga.api-url=https://api.fga.example",
+                                "openfga.authorization-model-id=authorization model ID",
+                                "openfga.store-id=store ID",
+                                "openfga.credentials.config.api-token=API_TOKEN")
+                        .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
+                        .run(context -> context.getBean("fgaConfig")));
 
         assertThat(exception.getCause().getMessage(), containsString("credentials method must not be null"));
     }
 
     @Test
     void failsIfCredentialsWithInvalidMethod() {
-        assertThrows(IllegalStateException.class, () -> contextRunner
-                .withPropertyValues(
-                        "openfga.api-url=https://api.fga.example",
-                        "openfga.authorization-model-id=authorization model ID",
-                        "openfga.store-id=store ID",
-                        "openfga.credentials.method=INVALID",
-                        "openfga.credentials.config.api-token=API_TOKEN")
-                .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
-                .run(context -> context.getBean("fgaConfig")));
+        assertThrows(
+                IllegalStateException.class,
+                () -> contextRunner
+                        .withPropertyValues(
+                                "openfga.api-url=https://api.fga.example",
+                                "openfga.authorization-model-id=authorization model ID",
+                                "openfga.store-id=store ID",
+                                "openfga.credentials.method=INVALID",
+                                "openfga.credentials.config.api-token=API_TOKEN")
+                        .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
+                        .run(context -> context.getBean("fgaConfig")));
     }
 
     @Test
     void failsIfReadTimeoutIsNegative() {
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> contextRunner
-                .withPropertyValues(
-                        "openfga.api-url=https://api.fga.example",
-                        "openfga.authorization-model-id=authorization model ID",
-                        "openfga.store-id=store ID",
-                        "openfga.read-timeout=-1s")
-                .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
-                .run(context -> context.getBean("fgaConfig")));
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> contextRunner
+                        .withPropertyValues(
+                                "openfga.api-url=https://api.fga.example",
+                                "openfga.authorization-model-id=authorization model ID",
+                                "openfga.store-id=store ID",
+                                "openfga.read-timeout=-1s")
+                        .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
+                        .run(context -> context.getBean("fgaConfig")));
 
         assertThat(exception.getCause().getMessage(), containsString("readTimeout must be positive"));
     }
 
     @Test
     void failsIfConnectTimeoutIsNegative() {
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> contextRunner
-                .withPropertyValues(
-                        "openfga.api-url=https://api.fga.example",
-                        "openfga.authorization-model-id=authorization model ID",
-                        "openfga.store-id=store ID",
-                        "openfga.connect-timeout=-1s")
-                .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
-                .run(context -> context.getBean("fgaConfig")));
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> contextRunner
+                        .withPropertyValues(
+                                "openfga.api-url=https://api.fga.example",
+                                "openfga.authorization-model-id=authorization model ID",
+                                "openfga.store-id=store ID",
+                                "openfga.connect-timeout=-1s")
+                        .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
+                        .run(context -> context.getBean("fgaConfig")));
 
         assertThat(exception.getCause().getMessage(), containsString("connectTimeout must be positive"));
     }
 
     @Test
     void failsIfMinimumRetryDelayIsNegative() {
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> contextRunner
-                .withPropertyValues(
-                        "openfga.api-url=https://api.fga.example",
-                        "openfga.authorization-model-id=authorization model ID",
-                        "openfga.store-id=store ID",
-                        "openfga.minimum-retry-delay=-1s")
-                .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
-                .run(context -> context.getBean("fgaConfig")));
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> contextRunner
+                        .withPropertyValues(
+                                "openfga.api-url=https://api.fga.example",
+                                "openfga.authorization-model-id=authorization model ID",
+                                "openfga.store-id=store ID",
+                                "openfga.minimum-retry-delay=-1s")
+                        .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
+                        .run(context -> context.getBean("fgaConfig")));
 
         assertThat(exception.getCause().getMessage(), containsString("minimumRetryDelay must be positive"));
     }
 
     @Test
     void failsIfMaxRetriesIsNegative() {
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> contextRunner
-                .withPropertyValues(
-                        "openfga.api-url=https://api.fga.example",
-                        "openfga.authorization-model-id=authorization model ID",
-                        "openfga.store-id=store ID",
-                        "openfga.max-retries=-1")
-                .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
-                .run(context -> context.getBean("fgaConfig")));
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> contextRunner
+                        .withPropertyValues(
+                                "openfga.api-url=https://api.fga.example",
+                                "openfga.authorization-model-id=authorization model ID",
+                                "openfga.store-id=store ID",
+                                "openfga.max-retries=-1")
+                        .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
+                        .run(context -> context.getBean("fgaConfig")));
 
         assertThat(exception.getCause().getMessage(), containsString("maxRetries must be positive or zero"));
     }
 
     @Test
     void failsIfMaxRetriesIsPositiveButMinimumRetryDelayIsNotSet() {
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> contextRunner
-                .withPropertyValues(
-                        "openfga.api-url=https://api.fga.example",
-                        "openfga.authorization-model-id=authorization model ID",
-                        "openfga.store-id=store ID",
-                        "openfga.max-retries=1")
-                .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
-                .run(context -> context.getBean("fgaConfig")));
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> contextRunner
+                        .withPropertyValues(
+                                "openfga.api-url=https://api.fga.example",
+                                "openfga.authorization-model-id=authorization model ID",
+                                "openfga.store-id=store ID",
+                                "openfga.max-retries=1")
+                        .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
+                        .run(context -> context.getBean("fgaConfig")));
 
         assertThat(
                 exception.getCause().getMessage(),

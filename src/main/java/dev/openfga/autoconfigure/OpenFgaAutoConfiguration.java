@@ -93,7 +93,8 @@ public class OpenFgaAutoConfiguration {
         return new TelemetryConfiguration()
                 .metrics(telemetryConfiguration.entrySet().stream()
                         .collect(Collectors.toMap(
-                                e -> e.getKey().getMetric(), metric -> metric.getValue().entrySet().stream()
+                                e -> e.getKey().getMetric(),
+                                metric -> metric.getValue().entrySet().stream()
                                         .collect(Collectors.toMap(
                                                 metricConfig ->
                                                         metricConfig.getKey().getAttribute(),
