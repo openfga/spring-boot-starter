@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.3.1
+
+### [0.3.1](https://github.com/openfga/spring-boot-starter/releases/tag/v0.3.1) (2026-03-31)
+
+- chore: update dependencies
+- fix: replace gradle/wrapper-validation-action with gradle/actions/setup-gradle
+- fix: restore executable permissions to gradlew
+
 ## v0.3.0
 
 ### [0.3.0](https://github.com/openfga/spring-boot-starter/releases/tag/v0.3.0) (2025-12-15)
