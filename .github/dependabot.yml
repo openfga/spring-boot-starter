@@ -6,6 +6,9 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+    ignore:
+      - dependency-name: "gradle/actions/setup-gradle"
+        versions: [">= 6.0.0, < 6.1.0"]
     groups:
       dependencies:
         patterns:
