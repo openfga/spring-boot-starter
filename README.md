@@ -36,13 +36,13 @@ It can be used with the following:
 * Gradle (Groovy)
 
 ```groovy
-implementation 'dev.openfga:openfga-spring-boot-starter:0.3.0'
+implementation 'dev.openfga:openfga-spring-boot-starter:0.3.1'
 ```
 
 * Gradle (Kotlin)
 
 ```kotlin
-implementation("dev.openfga:openfga-spring-boot-starter:0.3.0")
+implementation("dev.openfga:openfga-spring-boot-starter:0.3.1")
 ```
 
 * Apache Maven
@@ -52,7 +52,7 @@ implementation("dev.openfga:openfga-spring-boot-starter:0.3.0")
 <dependency>
     <groupId>dev.openfga</groupId>
     <artifactId>openfga-spring-boot-starter</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1</version>
 </dependency>
 ```
 
