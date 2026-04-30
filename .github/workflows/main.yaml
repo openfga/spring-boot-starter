@@ -27,11 +27,8 @@ jobs:
           java-version: ${{ matrix.java }}
           distribution: "temurin"
 
-      # Use the open-source basic cache provider
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
-        with:
-          cache-provider: basic
+        uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c # v5.0.2
 
       - name: Run Gradle check task
         run: ./gradlew check --continue
@@ -54,11 +51,8 @@ jobs:
           java-version: 17
           distribution: "temurin"
 
-      # Use the open-source basic cache provider
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
-        with:
-          cache-provider: basic
+        uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c # v5.0.2
 
       - name: Publish package
         # Tasks created by https://github.com/gradle-nexus/publish-plugin
@@ -87,11 +81,8 @@ jobs:
           java-version: 17
           distribution: "temurin"
 
-      # Use the open-source basic cache provider
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
-        with:
-          cache-provider: basic
+        uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c # v5.0.2
 
       - name: Publish package
         # Tasks created by https://docs.gradle.org/current/userguide/publishing_maven.html
