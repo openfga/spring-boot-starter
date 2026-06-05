@@ -209,7 +209,7 @@ public class OpenFgaProperties implements InitializingBean {
      *
      * @return the maximum number of retries
      */
-    public int getMaxRetries() {
+    public Integer getMaxRetries() {
         return maxRetries;
     }
 
