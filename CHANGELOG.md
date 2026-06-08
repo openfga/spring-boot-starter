@@ -4,7 +4,7 @@
 
 ### [0.3.1](https://github.com/openfga/spring-boot-starter/releases/tag/v0.3.1) (2026-03-31)
 
-- chore: minor ci changes & dependeny updates
+- chore: minor ci changes & dependency updates
 
 ## v0.3.0
 
