@@ -13,6 +13,7 @@ import dev.openfga.sdk.api.configuration.*;
 import dev.openfga.sdk.errors.FgaInvalidParameterException;
 import java.net.http.HttpClient;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.openapitools.jackson.nullable.JsonNullableModule;
@@ -48,7 +49,7 @@ public class OpenFgaAutoConfiguration {
         var clientConfiguration = new ClientConfiguration();
         var map = PropertyMapper.get();
         map.from(openFgaProperties::getCredentials)
-                .whenNonNull()
+                .when(Objects::nonNull)
                 .as(OpenFgaAutoConfiguration::toCredentials)
                 .to(clientConfiguration::credentials);
         map.from(openFgaProperties::getApiUrl).whenHasText().to(clientConfiguration::apiUrl);
@@ -57,13 +58,15 @@ public class OpenFgaAutoConfiguration {
                 .whenHasText()
                 .to(clientConfiguration::authorizationModelId);
         map.from(openFgaProperties::getUserAgent).whenHasText().to(clientConfiguration::userAgent);
-        map.from(openFgaProperties::getReadTimeout).whenNonNull().to(clientConfiguration::readTimeout);
-        map.from(openFgaProperties::getConnectTimeout).whenNonNull().to(clientConfiguration::connectTimeout);
-        map.from(openFgaProperties::getMaxRetries).whenNonNull().to(clientConfiguration::maxRetries);
-        map.from(openFgaProperties::getMinimumRetryDelay).whenNonNull().to(clientConfiguration::minimumRetryDelay);
-        map.from(openFgaProperties::getDefaultHeaders).whenNonNull().to(clientConfiguration::defaultHeaders);
+        map.from(openFgaProperties::getReadTimeout).when(Objects::nonNull).to(clientConfiguration::readTimeout);
+        map.from(openFgaProperties::getConnectTimeout).when(Objects::nonNull).to(clientConfiguration::connectTimeout);
+        map.from(openFgaProperties::getMaxRetries).when(Objects::nonNull).to(clientConfiguration::maxRetries);
+        map.from(openFgaProperties::getMinimumRetryDelay)
+                .when(Objects::nonNull)
+                .to(clientConfiguration::minimumRetryDelay);
+        map.from(openFgaProperties::getDefaultHeaders).when(Objects::nonNull).to(clientConfiguration::defaultHeaders);
         map.from(openFgaProperties::getTelemetryConfiguration)
-                .whenNonNull()
+                .when(Objects::nonNull)
                 .as(OpenFgaAutoConfiguration::toTelemetryConfiguration)
                 .to(clientConfiguration::telemetryConfiguration);
         return clientConfiguration;
