@@ -55,7 +55,6 @@ class OpenFgaTest {
         // then
         ArgumentCaptor<ClientCheckRequest> argumentCaptor = ArgumentCaptor.forClass(ClientCheckRequest.class);
 
-        verify(mockClient, times(1)).check(any(ClientCheckRequest.class));
         verify(mockClient).check(argumentCaptor.capture());
 
         ClientCheckRequest request = argumentCaptor.getValue();
@@ -81,7 +80,6 @@ class OpenFgaTest {
         // then
         ArgumentCaptor<ClientCheckRequest> argumentCaptor = ArgumentCaptor.forClass(ClientCheckRequest.class);
 
-        verify(mockClient, times(1)).check(any(ClientCheckRequest.class));
         verify(mockClient).check(argumentCaptor.capture());
 
         ClientCheckRequest request = argumentCaptor.getValue();
@@ -121,7 +119,6 @@ class OpenFgaTest {
         // then
         ArgumentCaptor<ClientCheckRequest> argumentCaptor = ArgumentCaptor.forClass(ClientCheckRequest.class);
 
-        verify(mockClient, times(1)).check(any(ClientCheckRequest.class));
         verify(mockClient).check(argumentCaptor.capture());
 
         ClientCheckRequest request = argumentCaptor.getValue();
@@ -153,7 +150,6 @@ class OpenFgaTest {
         // then
         ArgumentCaptor<ClientCheckRequest> argumentCaptor = ArgumentCaptor.forClass(ClientCheckRequest.class);
 
-        verify(mockClient, times(1)).check(any(ClientCheckRequest.class));
         verify(mockClient).check(argumentCaptor.capture());
 
         ClientCheckRequest request = argumentCaptor.getValue();
