@@ -61,13 +61,8 @@ public class OpenFgaInitializer implements ApplicationRunner {
         writeTuples(authorizationModelId);
     }
 
-    private boolean authorizationModelExists() {
-        try {
-            return fgaClient.readLatestAuthorizationModel().get().getAuthorizationModel() != null;
-        } catch (Exception e) {
-            logger.debug("Unable to read latest authorization model; assuming none exists", e);
-            return false;
-        }
+    private boolean authorizationModelExists() throws Exception {
+        return fgaClient.readLatestAuthorizationModel().get().getAuthorizationModel() != null;
     }
 
     private String writeModel() throws Exception {
