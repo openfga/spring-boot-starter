@@ -273,6 +273,61 @@ class OpenFgaAutoConfigurationTests {
     }
 
     @Test
+    void initializerBeanNotCreatedByDefault() {
+        contextRunner
+                .withPropertyValues("openfga.api-url=https://api.fga.example", "openfga.store-id=store ID")
+                .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
+                .run(context -> assertThat(context.containsBean("openFgaInitializer"), is(false)));
+    }
+
+    @Test
+    void initializerBeanNotCreatedWhenModeNever() {
+        contextRunner
+                .withPropertyValues(
+                        "openfga.api-url=https://api.fga.example",
+                        "openfga.store-id=store ID",
+                        "openfga.initialization.mode=never",
+                        "openfga.initialization.model-location=classpath:fga/model.json")
+                .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
+                .run(context -> assertThat(context.containsBean("openFgaInitializer"), is(false)));
+    }
+
+    @Test
+    void initializerBeanCreatedWhenModeEmbedded() {
+        contextRunner
+                .withPropertyValues(
+                        "openfga.api-url=https://api.fga.example",
+                        "openfga.store-id=store ID",
+                        "openfga.initialization.mode=embedded",
+                        "openfga.initialization.model-location=classpath:fga/model.json",
+                        "openfga.initialization.tuples-location=classpath:fga/tuples.json")
+                .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
+                .run(context -> {
+                    assertThat(context.containsBean("openFgaInitializer"), is(true));
+                    OpenFgaProperties properties = context.getBean(OpenFgaProperties.class);
+                    OpenFgaProperties.Initialization initialization = properties.getInitialization();
+                    assertThat(initialization.getMode(), is(OpenFgaProperties.InitializationMode.EMBEDDED));
+                    assertThat(initialization.getModelLocation(), is("classpath:fga/model.json"));
+                    assertThat(initialization.getTuplesLocation(), is("classpath:fga/tuples.json"));
+                });
+    }
+
+    @Test
+    void failsIfModeEmbeddedButNoModelLocation() {
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> contextRunner
+                .withPropertyValues(
+                        "openfga.api-url=https://api.fga.example",
+                        "openfga.store-id=store ID",
+                        "openfga.initialization.mode=embedded")
+                .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
+                .run(context -> context.getBean("openFgaInitializer")));
+
+        assertThat(
+                exception.getCause().getMessage(),
+                containsString("initialization.model-location must be set when initialization.mode is 'EMBEDDED'"));
+    }
+
+    @Test
     void failsIfMaxRetriesIsPositiveButMinimumRetryDelayIsNotSet() {
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> contextRunner
                 .withPropertyValues(

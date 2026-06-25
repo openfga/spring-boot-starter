@@ -1,0 +1,9 @@
+{
+  "writes": [
+    {
+      "user": "user:123",
+      "relation": "reader",
+      "object": "document:1"
+    }
+  ]
+}
