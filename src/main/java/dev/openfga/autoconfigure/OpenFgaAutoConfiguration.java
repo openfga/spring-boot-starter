@@ -38,21 +38,37 @@ import org.springframework.context.annotation.Bean;
 public class OpenFgaAutoConfiguration {
 
     /**
-     * Configures the OpenFGA client with the provided properties.
+     * Provides {@link OpenFgaConnectionDetails} sourced from the configuration properties, unless a
+     * {@link OpenFgaConnectionDetails} bean (for example, one contributed by a Testcontainers
+     * {@code @ServiceConnection}) is already present.
      *
      * @param openFgaProperties the configuration properties for OpenFGA
+     * @return the properties-based {@link OpenFgaConnectionDetails} bean
+     */
+    @Bean
+    @ConditionalOnMissingBean(OpenFgaConnectionDetails.class)
+    public OpenFgaConnectionDetails openFgaConnectionDetails(OpenFgaProperties openFgaProperties) {
+        return openFgaProperties::getApiUrl;
+    }
+
+    /**
+     * Configures the OpenFGA client with the provided properties and connection details.
+     *
+     * @param openFgaProperties the configuration properties for OpenFGA
+     * @param connectionDetails the resolved {@link OpenFgaConnectionDetails}
      * @return the configured {@link ClientConfiguration} bean
      */
     @Bean
     @ConditionalOnMissingBean
-    public ClientConfiguration fgaConfig(OpenFgaProperties openFgaProperties) {
+    public ClientConfiguration fgaConfig(
+            OpenFgaProperties openFgaProperties, OpenFgaConnectionDetails connectionDetails) {
         var clientConfiguration = new ClientConfiguration();
         var map = PropertyMapper.get();
         map.from(openFgaProperties::getCredentials)
                 .when(Objects::nonNull)
                 .as(OpenFgaAutoConfiguration::toCredentials)
                 .to(clientConfiguration::credentials);
-        map.from(openFgaProperties::getApiUrl).whenHasText().to(clientConfiguration::apiUrl);
+        map.from(connectionDetails::getApiUrl).whenHasText().to(clientConfiguration::apiUrl);
         map.from(openFgaProperties::getStoreId).whenHasText().to(clientConfiguration::storeId);
         map.from(openFgaProperties::getAuthorizationModelId)
                 .whenHasText()
