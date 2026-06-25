@@ -29,8 +29,10 @@ import org.springframework.context.annotation.Bean;
 /**
  * Configures an {@code openFgaClient} and {@code openFga} beans based
  * on configuration values. The beans will only be created if the
- * {@link OpenFgaClient} is present on the classpath, and the
- * {@code openfga.api-url} is specified.
+ * {@link OpenFgaClient} is present on the classpath and either the
+ * {@code openfga.api-url} property is specified or an
+ * {@link OpenFgaConnectionDetails} bean is present (for example, one
+ * contributed by a Testcontainers {@code @ServiceConnection}).
  */
 @AutoConfiguration
 @ConditionalOnFgaProperties

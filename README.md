@@ -365,12 +365,12 @@ property is required in tests:
 
 ```java
 @SpringBootTest
-@Testcontainers
+@Testcontainers(disabledWithoutDocker = true)
 class MyOpenFgaTests {
 
     @Container
     @ServiceConnection
-    static OpenFGAContainer openfga = new OpenFGAContainer("openfga/openfga:latest");
+    static OpenFGAContainer openfga = new OpenFGAContainer("openfga/openfga:v1.4.3");
 
     @Autowired
     OpenFgaClient fgaClient;
