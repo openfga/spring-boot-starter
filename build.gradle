@@ -53,6 +53,7 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.hamcrest:hamcrest'
     testImplementation 'org.mockito:mockito-core'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind'
 }
 
 test {

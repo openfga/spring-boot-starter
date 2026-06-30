@@ -25,6 +25,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.context.properties.PropertyMapper;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.ResourceLoader;
 
 /**
  * Configures an {@code openFgaClient} and {@code openFga} beans based
@@ -198,6 +199,30 @@ public class OpenFgaAutoConfiguration {
     @ConditionalOnMissingBean
     public OpenFgaExceptionHandler openFgaExceptionHandler() {
         return new OpenFgaExceptionHandler();
+    }
+
+    /**
+     * Creates an {@link OpenFgaInitializer} that writes the configured authorization model and
+     * tuples into OpenFGA at startup. Only created when {@code openfga.initialization.mode} is
+     * set to {@code embedded}.
+     *
+     * @param openFgaClient the {@link OpenFgaClient} bean
+     * @param openFgaProperties the configuration properties for OpenFGA
+     * @param objectMapperProvider provides the {@link ObjectMapper} bean
+     * @param resourceLoader the {@link ResourceLoader} used to resolve the configured locations
+     * @return the {@link OpenFgaInitializer} bean
+     */
+    @Bean
+    @ConditionalOnProperty(prefix = "openfga.initialization", name = "mode", havingValue = "embedded")
+    @ConditionalOnMissingBean
+    public OpenFgaInitializer openFgaInitializer(
+            OpenFgaClient openFgaClient,
+            OpenFgaProperties openFgaProperties,
+            ObjectProvider<ObjectMapper> objectMapperProvider,
+            ResourceLoader resourceLoader) {
+        var objectMapper = objectMapperProvider.getIfAvailable(OpenFgaAutoConfiguration::createDefaultObjectMapper);
+        return new OpenFgaInitializer(
+                openFgaClient, openFgaProperties.getInitialization(), resourceLoader, objectMapper);
     }
 
     /**

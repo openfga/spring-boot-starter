@@ -79,6 +79,11 @@ public class OpenFgaProperties implements InitializingBean {
     private Map<TelemetryMetric, Map<TelemetryAttribute, Object>> telemetryConfiguration;
 
     /**
+     * Configuration for importing an initial authorization model and tuples at startup.
+     */
+    private Initialization initialization = new Initialization();
+
+    /**
      * Gets the URL to the OpenFGA instance.
      *
      * @return the API URL
@@ -295,6 +300,24 @@ public class OpenFgaProperties implements InitializingBean {
         this.telemetryConfiguration = telemetryConfiguration;
     }
 
+    /**
+     * Gets the initialization configuration.
+     *
+     * @return the initialization configuration
+     */
+    public Initialization getInitialization() {
+        return initialization;
+    }
+
+    /**
+     * Sets the initialization configuration.
+     *
+     * @param initialization the initialization configuration to set
+     */
+    public void setInitialization(Initialization initialization) {
+        this.initialization = initialization;
+    }
+
     @Override
     public void afterPropertiesSet() {
         validate();
@@ -341,12 +364,116 @@ public class OpenFgaProperties implements InitializingBean {
                 throw new IllegalStateException("minimumRetryDelay must be set if maxRetries is set");
             }
         }
+        if (initialization != null
+                && initialization.getMode() == InitializationMode.EMBEDDED
+                && !StringUtils.hasText(initialization.getModelLocation())) {
+            throw new IllegalStateException(
+                    "initialization.model-location must be set when initialization.mode is 'EMBEDDED'");
+        }
     }
 
     private static void assertPositivity(Duration duration, String fieldName) {
         if (duration != null && duration.isNegative()) {
             throw new IllegalStateException("%s must be positive".formatted(fieldName));
         }
+    }
+
+    /**
+     * Properties controlling whether an initial authorization model and tuples are
+     * written to OpenFGA at application startup, analogous to Spring Boot's
+     * {@code schema.sql}/{@code data.sql} database initialization.
+     */
+    public static class Initialization {
+
+        /**
+         * Whether to perform OpenFGA initialization at startup. Defaults to {@link InitializationMode#NEVER}.
+         */
+        private InitializationMode mode = InitializationMode.NEVER;
+
+        /**
+         * Location of the authorization model to write, as a Spring resource path
+         * (e.g. {@code classpath:fga/model.json}). The resource must contain a JSON
+         * {@code WriteAuthorizationModelRequest}. Required when {@link #mode} is {@code EMBEDDED}.
+         */
+        private String modelLocation;
+
+        /**
+         * Optional location of the initial tuples to write, as a Spring resource path
+         * (e.g. {@code classpath:fga/tuples.json}). The resource must contain a JSON
+         * {@code ClientWriteRequest}.
+         */
+        private String tuplesLocation;
+
+        /**
+         * Gets the initialization mode.
+         *
+         * @return the initialization mode
+         */
+        public InitializationMode getMode() {
+            return mode;
+        }
+
+        /**
+         * Sets the initialization mode.
+         *
+         * @param mode the initialization mode to set
+         */
+        public void setMode(InitializationMode mode) {
+            this.mode = mode;
+        }
+
+        /**
+         * Gets the authorization model resource location.
+         *
+         * @return the model location
+         */
+        public String getModelLocation() {
+            return modelLocation;
+        }
+
+        /**
+         * Sets the authorization model resource location.
+         *
+         * @param modelLocation the model location to set
+         */
+        public void setModelLocation(String modelLocation) {
+            this.modelLocation = modelLocation;
+        }
+
+        /**
+         * Gets the initial tuples resource location.
+         *
+         * @return the tuples location
+         */
+        public String getTuplesLocation() {
+            return tuplesLocation;
+        }
+
+        /**
+         * Sets the initial tuples resource location.
+         *
+         * @param tuplesLocation the tuples location to set
+         */
+        public void setTuplesLocation(String tuplesLocation) {
+            this.tuplesLocation = tuplesLocation;
+        }
+    }
+
+    /**
+     * Modes controlling OpenFGA startup initialization.
+     */
+    public enum InitializationMode {
+
+        /**
+         * Do not perform any initialization.
+         */
+        NEVER,
+
+        /**
+         * Write the configured authorization model and tuples at startup if no
+         * authorization model already exists in the store.
+         */
+        EMBEDDED
     }
 
     /**
