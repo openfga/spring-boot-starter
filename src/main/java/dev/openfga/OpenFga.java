@@ -2,7 +2,9 @@ package dev.openfga;
 
 import dev.openfga.sdk.api.client.OpenFgaClient;
 import dev.openfga.sdk.api.client.model.ClientCheckRequest;
+import dev.openfga.sdk.api.client.model.ClientTupleKey;
 import dev.openfga.sdk.errors.FgaInvalidParameterException;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -69,10 +71,76 @@ public class OpenFga {
      * @see <a href="https://openfga.dev/api/service#/Relationship%20Queries/Check">FGA Check API</a>
      */
     public boolean check(String objectType, String objectId, String relation, String userType, String userId) {
+        return check(objectType, objectId, relation, userType, userId, null, null);
+    }
+
+    /**
+     * Perform an FGA check, supplying contextual tuples and/or a context object for the evaluation. Returns {@code true}
+     * if the user has the specified relationship with the object, {@code false} otherwise. The user ID will be obtained
+     * from the authentication name in the {@link org.springframework.security.core.context.SecurityContext}.<br/><br/>
+     * Contextual tuples are evaluated as if they existed in the store, and the context object can be used to satisfy
+     * conditions defined in the authorization model.
+     *
+     * @param objectType The object type of the check
+     * @param objectId The ID of the object to check
+     * @param relation The required relation between the user and the object
+     * @param userType The type of the user
+     * @param contextualTuples The contextual tuples to evaluate as part of the check, may be {@code null}
+     * @param context The context object used to evaluate conditions in the authorization model, may be {@code null}
+     * @return true if the user has the required relation to the object, false otherwise
+     *
+     * @see <a href="https://openfga.dev/api/service#/Relationship%20Queries/Check">FGA Check API</a>
+     */
+    public boolean check(
+            String objectType,
+            String objectId,
+            String relation,
+            String userType,
+            List<ClientTupleKey> contextualTuples,
+            Object context) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            throw new IllegalStateException(
+                    "No user provided, and no authentication could be found in the security context");
+        }
+        return check(objectType, objectId, relation, userType, authentication.getName(), contextualTuples, context);
+    }
+
+    /**
+     * Perform an FGA check, supplying contextual tuples and/or a context object for the evaluation. Returns {@code true}
+     * if the user has the specified relationship with the object, {@code false} otherwise.<br/><br/>Contextual tuples are
+     * evaluated as if they existed in the store, and the context object can be used to satisfy conditions defined in the
+     * authorization model.
+     *
+     * @param objectType The object type of the check
+     * @param objectId The ID of the object to check
+     * @param relation The required relation between the user and the object
+     * @param userType The type of the user
+     * @param userId The ID of the user
+     * @param contextualTuples The contextual tuples to evaluate as part of the check, may be {@code null}
+     * @param context The context object used to evaluate conditions in the authorization model, may be {@code null}
+     * @return true if the user has the required relation to the object, false otherwise
+     *
+     * @see <a href="https://openfga.dev/api/service#/Relationship%20Queries/Check">FGA Check API</a>
+     */
+    public boolean check(
+            String objectType,
+            String objectId,
+            String relation,
+            String userType,
+            String userId,
+            List<ClientTupleKey> contextualTuples,
+            Object context) {
         var body = new ClientCheckRequest()
                 .user(String.format("%s:%s", userType, userId))
                 .relation(relation)
                 ._object(String.format("%s:%s", objectType, objectId));
+        if (contextualTuples != null) {
+            body.contextualTuples(contextualTuples);
+        }
+        if (context != null) {
+            body.context(context);
+        }
         try {
             return Boolean.TRUE.equals(fgaClient.check(body).get().getAllowed());
         } catch (InterruptedException | FgaInvalidParameterException | ExecutionException cause) {
