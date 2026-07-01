@@ -69,6 +69,30 @@ class OpenFgaAutoConfigurationTests {
     }
 
     @Test
+    void connectionDetailsBeanActivatesBeansAndSuppliesApiUrl() {
+        contextRunner
+                .withBean(OpenFgaConnectionDetails.class, () -> () -> "https://from-connection-details")
+                .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
+                .run(context -> {
+                    assertThat(context.containsBean("fgaClient"), is(true));
+                    ClientConfiguration config = (ClientConfiguration) context.getBean("fgaConfig");
+                    assertThat(config.getApiUrl(), is("https://from-connection-details"));
+                });
+    }
+
+    @Test
+    void connectionDetailsBeanTakesPrecedenceOverApiUrlProperty() {
+        contextRunner
+                .withPropertyValues("openfga.api-url=https://from-property")
+                .withBean(OpenFgaConnectionDetails.class, () -> () -> "https://from-connection-details")
+                .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
+                .run(context -> {
+                    ClientConfiguration config = (ClientConfiguration) context.getBean("fgaConfig");
+                    assertThat(config.getApiUrl(), is("https://from-connection-details"));
+                });
+    }
+
+    @Test
     void beanConfiguredForNoAuthorization() {
         contextRunner
                 .withPropertyValues(
