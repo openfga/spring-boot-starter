@@ -355,6 +355,35 @@ public HttpClient.Builder httpClientBuilder() {
 }
 ```
 
+## Testing with Testcontainers
+
+The starter ships a Spring Boot [`@ServiceConnection`](https://docs.spring.io/spring-boot/reference/testing/testcontainers.html#testing.testcontainers.service-connections)
+for OpenFGA. When the optional `org.springframework.boot:spring-boot-testcontainers` and
+`org.testcontainers:openfga` dependencies are on the test classpath, an `OpenFGAContainer` annotated
+with `@ServiceConnection` is automatically mapped into the Spring environment, so no `openfga.api-url`
+property is required in tests:
+
+```java
+@SpringBootTest
+@Testcontainers(disabledWithoutDocker = true)
+class MyOpenFgaTests {
+
+    @Container
+    @ServiceConnection
+    static OpenFGAContainer openfga = new OpenFGAContainer("openfga/openfga:v1.4.3");
+
+    @Autowired
+    OpenFgaClient fgaClient;
+
+    // ...
+}
+```
+
+The container's HTTP endpoint is supplied to the auto-configured `OpenFgaClient` via an
+`OpenFgaConnectionDetails` bean. Defining your own `OpenFgaConnectionDetails` bean (or the standard
+`openfga.api-url` property) continues to work and takes precedence when no service connection is
+present.
+
 ## Contributing
 
 ### Issues
