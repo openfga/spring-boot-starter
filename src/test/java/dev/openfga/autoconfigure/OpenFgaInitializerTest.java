@@ -1,6 +1,7 @@
 package dev.openfga.autoconfigure;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -20,6 +21,7 @@ import dev.openfga.sdk.api.model.WriteAuthorizationModelRequest;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -63,6 +65,16 @@ class OpenFgaInitializerTest {
         when(fgaClient.writeAuthorizationModel(any())).thenReturn(CompletableFuture.completedFuture(response));
     }
 
+    private static void assertInterruptRestored(Executable action) {
+        try {
+            Thread.currentThread().interrupt();
+            assertThrows(InterruptedException.class, action);
+            assertTrue(Thread.currentThread().isInterrupted());
+        } finally {
+            Thread.interrupted();
+        }
+    }
+
     @Test
     void skipsWhenAuthorizationModelAlreadyExists() throws Exception {
         stubLatestModel(new AuthorizationModel());
@@ -91,10 +103,11 @@ class OpenFgaInitializerTest {
     void writesModelAndTuplesWhenTuplesLocationConfigured() throws Exception {
         stubLatestModel(null);
         stubResource("classpath:fga/model.json", "{}".getBytes());
-        stubResource("classpath:fga/tuples.json", "[]".getBytes());
+        var tuples = "{\"writes\":[]}".getBytes();
+        stubResource("classpath:fga/tuples.json", tuples);
         when(objectMapper.readValue("{}".getBytes(), WriteAuthorizationModelRequest.class))
                 .thenReturn(new WriteAuthorizationModelRequest());
-        when(objectMapper.readValue("[]".getBytes(), ClientWriteRequest.class)).thenReturn(new ClientWriteRequest());
+        when(objectMapper.readValue(tuples, ClientWriteRequest.class)).thenReturn(new ClientWriteRequest());
         stubModelWrite();
         when(fgaClient.write(any(), any(ClientWriteOptions.class)))
                 .thenReturn(CompletableFuture.completedFuture(mock(ClientWriteResponse.class)));
@@ -115,6 +128,42 @@ class OpenFgaInitializerTest {
                 .run(null));
 
         verify(fgaClient, never()).writeAuthorizationModel(any());
+    }
+
+    @Test
+    void restoresInterruptFlagWhenModelReadIsInterrupted() throws Exception {
+        when(fgaClient.readLatestAuthorizationModel()).thenReturn(new CompletableFuture<>());
+
+        assertInterruptRestored(
+                () -> initializer("classpath:fga/model.json", null).run(null));
+    }
+
+    @Test
+    void restoresInterruptFlagWhenModelWriteIsInterrupted() throws Exception {
+        stubLatestModel(null);
+        stubResource("classpath:fga/model.json", "{}".getBytes());
+        when(objectMapper.readValue("{}".getBytes(), WriteAuthorizationModelRequest.class))
+                .thenReturn(new WriteAuthorizationModelRequest());
+        when(fgaClient.writeAuthorizationModel(any())).thenReturn(new CompletableFuture<>());
+
+        assertInterruptRestored(
+                () -> initializer("classpath:fga/model.json", null).run(null));
+    }
+
+    @Test
+    void restoresInterruptFlagWhenTupleWriteIsInterrupted() throws Exception {
+        stubLatestModel(null);
+        stubResource("classpath:fga/model.json", "{}".getBytes());
+        var tuples = "{\"writes\":[]}".getBytes();
+        stubResource("classpath:fga/tuples.json", tuples);
+        when(objectMapper.readValue("{}".getBytes(), WriteAuthorizationModelRequest.class))
+                .thenReturn(new WriteAuthorizationModelRequest());
+        when(objectMapper.readValue(tuples, ClientWriteRequest.class)).thenReturn(new ClientWriteRequest());
+        stubModelWrite();
+        when(fgaClient.write(any(), any(ClientWriteOptions.class))).thenReturn(new CompletableFuture<>());
+
+        assertInterruptRestored(() -> initializer("classpath:fga/model.json", "classpath:fga/tuples.json")
+                .run(null));
     }
 
     @Test

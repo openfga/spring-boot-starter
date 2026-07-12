@@ -364,11 +364,20 @@ public class OpenFgaProperties implements InitializingBean {
                 throw new IllegalStateException("minimumRetryDelay must be set if maxRetries is set");
             }
         }
-        if (initialization != null
-                && initialization.getMode() == InitializationMode.EMBEDDED
-                && !StringUtils.hasText(initialization.getModelLocation())) {
-            throw new IllegalStateException(
-                    "initialization.model-location must be set when initialization.mode is 'EMBEDDED'");
+        if (initialization != null) {
+            InitializationMode mode = initialization.getMode();
+            if (mode == null) {
+                throw new IllegalStateException("initialization.mode must not be null");
+            }
+            if (mode == InitializationMode.EMBEDDED) {
+                if (!StringUtils.hasText(storeId)) {
+                    throw new IllegalStateException("store-id must be set when initialization.mode is 'EMBEDDED'");
+                }
+                if (!StringUtils.hasText(initialization.getModelLocation())) {
+                    throw new IllegalStateException(
+                            "initialization.model-location must be set when initialization.mode is 'EMBEDDED'");
+                }
+            }
         }
     }
 

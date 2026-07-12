@@ -53,12 +53,17 @@ public class OpenFgaInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        if (authorizationModelExists()) {
-            logger.info("OpenFGA store already has an authorization model; skipping initialization");
-            return;
+        try {
+            if (authorizationModelExists()) {
+                logger.info("OpenFGA store already has an authorization model; skipping initialization");
+                return;
+            }
+            String authorizationModelId = writeModel();
+            writeTuples(authorizationModelId);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw e;
         }
-        String authorizationModelId = writeModel();
-        writeTuples(authorizationModelId);
     }
 
     private boolean authorizationModelExists() throws Exception {

@@ -352,6 +352,31 @@ class OpenFgaAutoConfigurationTests {
     }
 
     @Test
+    void failsIfInitializationModeIsNull() {
+        var properties = new OpenFgaProperties();
+        properties.getInitialization().setMode(null);
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, properties::validate);
+
+        assertThat(exception.getMessage(), containsString("initialization.mode must not be null"));
+    }
+
+    @Test
+    void failsIfModeEmbeddedButNoStoreId() {
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> contextRunner
+                .withPropertyValues(
+                        "openfga.api-url=https://api.fga.example",
+                        "openfga.initialization.mode=embedded",
+                        "openfga.initialization.model-location=classpath:fga/model.json")
+                .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
+                .run(context -> context.getBean("openFgaInitializer")));
+
+        assertThat(
+                exception.getCause().getMessage(),
+                containsString("store-id must be set when initialization.mode is 'EMBEDDED'"));
+    }
+
+    @Test
     void failsIfMaxRetriesIsPositiveButMinimumRetryDelayIsNotSet() {
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> contextRunner
                 .withPropertyValues(
