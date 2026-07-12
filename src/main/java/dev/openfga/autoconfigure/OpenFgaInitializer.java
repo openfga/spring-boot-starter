@@ -1,10 +1,19 @@
 package dev.openfga.autoconfigure;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.openfga.sdk.api.client.OpenFgaClient;
+import dev.openfga.sdk.api.client.model.ClientReadRequest;
+import dev.openfga.sdk.api.client.model.ClientReadResponse;
+import dev.openfga.sdk.api.client.model.ClientTupleKey;
+import dev.openfga.sdk.api.client.model.ClientTupleKeyWithoutCondition;
 import dev.openfga.sdk.api.client.model.ClientWriteRequest;
+import dev.openfga.sdk.api.configuration.ClientReadOptions;
 import dev.openfga.sdk.api.configuration.ClientWriteOptions;
+import dev.openfga.sdk.api.model.ConsistencyPreference;
 import dev.openfga.sdk.api.model.WriteAuthorizationModelRequest;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
@@ -18,10 +27,9 @@ import org.springframework.util.StringUtils;
  * application startup. This is the OpenFGA analogue of Spring Boot's {@code schema.sql}/{@code data.sql}
  * database initialization.
  *
- * <p>The initializer is idempotent: if the configured store already has an authorization model, it
- * does nothing. Otherwise it writes the model from {@code openfga.initialization.model-location} and,
- * if configured, the tuples from {@code openfga.initialization.tuples-location}. Any failure is
- * propagated so that the application fails fast.
+ * <p>The initializer writes the configured model only when the store has none. If tuples are
+ * configured, it transactionally ensures them on every startup so interrupted initialization can
+ * be retried safely. Any failure is propagated so that the application fails fast.
  */
 public class OpenFgaInitializer implements ApplicationRunner {
 
@@ -48,17 +56,16 @@ public class OpenFgaInitializer implements ApplicationRunner {
         this.fgaClient = fgaClient;
         this.initialization = initialization;
         this.resourceLoader = resourceLoader;
-        this.objectMapper = objectMapper;
+        this.objectMapper = objectMapper
+                .copy()
+                .addMixIn(ClientTupleKey.class, ClientTupleKeyMixin.class)
+                .addMixIn(ClientTupleKeyWithoutCondition.class, ClientTupleKeyWithoutConditionMixin.class);
     }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         try {
-            if (authorizationModelExists()) {
-                logger.info("OpenFGA store already has an authorization model; skipping initialization");
-                return;
-            }
-            String authorizationModelId = writeModel();
+            String authorizationModelId = findOrWriteAuthorizationModel();
             writeTuples(authorizationModelId);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -66,8 +73,13 @@ public class OpenFgaInitializer implements ApplicationRunner {
         }
     }
 
-    private boolean authorizationModelExists() throws Exception {
-        return fgaClient.readLatestAuthorizationModel().get().getAuthorizationModel() != null;
+    private String findOrWriteAuthorizationModel() throws Exception {
+        var authorizationModel = fgaClient.readLatestAuthorizationModel().get().getAuthorizationModel();
+        if (authorizationModel != null) {
+            logger.info("OpenFGA store already has an authorization model; skipping model initialization");
+            return authorizationModel.getId();
+        }
+        return writeModel();
     }
 
     private String writeModel() throws Exception {
@@ -95,14 +107,77 @@ public class OpenFgaInitializer implements ApplicationRunner {
             throw new IllegalStateException(
                     "OpenFGA initial tuples location does not exist: " + initialization.getTuplesLocation());
         }
-        var request = objectMapper.readValue(resource.getContentAsByteArray(), ClientWriteRequest.class);
-        fgaClient
-                .write(
-                        request,
-                        new ClientWriteOptions()
-                                .authorizationModelId(authorizationModelId)
-                                .disableTransactions(true))
-                .get();
+        var requestedTuples = objectMapper.readValue(resource.getContentAsByteArray(), ClientWriteRequest.class);
+        var pendingTuples = pendingTuples(requestedTuples);
+        if (!hasChanges(pendingTuples)) {
+            logger.info("Initial OpenFGA tuples already present; skipping tuple initialization");
+            return;
+        }
+        try {
+            fgaClient
+                    .write(pendingTuples, new ClientWriteOptions().authorizationModelId(authorizationModelId))
+                    .get();
+        } catch (ExecutionException e) {
+            if (hasChanges(pendingTuples(requestedTuples))) {
+                throw e;
+            }
+        }
         logger.info("Wrote initial OpenFGA tuples from {}", initialization.getTuplesLocation());
+    }
+
+    private ClientWriteRequest pendingTuples(ClientWriteRequest requestedTuples) throws Exception {
+        var pendingTuples = new ClientWriteRequest();
+        if (requestedTuples.getWrites() != null) {
+            var pendingWrites = new ArrayList<ClientTupleKey>();
+            for (var tuple : requestedTuples.getWrites()) {
+                if (!tupleExists(tuple)) {
+                    pendingWrites.add(tuple);
+                }
+            }
+            pendingTuples.writes(pendingWrites);
+        }
+        if (requestedTuples.getDeletes() != null) {
+            var pendingDeletes = new ArrayList<ClientTupleKeyWithoutCondition>();
+            for (var tuple : requestedTuples.getDeletes()) {
+                if (tupleExists(tuple)) {
+                    pendingDeletes.add(tuple);
+                }
+            }
+            pendingTuples.deletes(pendingDeletes);
+        }
+        return pendingTuples;
+    }
+
+    private boolean tupleExists(ClientTupleKey tuple) throws Exception {
+        return readTuple(tuple).getTuples().stream()
+                .anyMatch(existingTuple -> tuple.asTupleKey().equals(existingTuple.getKey()));
+    }
+
+    private boolean tupleExists(ClientTupleKeyWithoutCondition tuple) throws Exception {
+        return !readTuple(tuple).getTuples().isEmpty();
+    }
+
+    private ClientReadResponse readTuple(ClientTupleKeyWithoutCondition tuple) throws Exception {
+        var request = new ClientReadRequest()
+                .user(tuple.getUser())
+                .relation(tuple.getRelation())
+                ._object(tuple.getObject());
+        var options = new ClientReadOptions().consistency(ConsistencyPreference.HIGHER_CONSISTENCY);
+        return fgaClient.read(request, options).get();
+    }
+
+    private static boolean hasChanges(ClientWriteRequest request) {
+        return (request.getWrites() != null && !request.getWrites().isEmpty())
+                || (request.getDeletes() != null && !request.getDeletes().isEmpty());
+    }
+
+    private abstract static class ClientTupleKeyMixin {
+        @JsonSetter("object")
+        abstract ClientTupleKey _object(String object);
+    }
+
+    private abstract static class ClientTupleKeyWithoutConditionMixin {
+        @JsonSetter("object")
+        abstract ClientTupleKeyWithoutCondition _object(String object);
     }
 }
