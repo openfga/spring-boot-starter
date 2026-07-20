@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.3.2](https://github.com/openfga/spring-boot-starter/compare/v0.3.1...v0.3.2) (2026-07-20)
+
+
+### Added
+
+* add OpenFGA Testcontainers service connection ([3ab552c](https://github.com/openfga/spring-boot-starter/commit/3ab552cce7fdd9ed13d22fa6ea5e7022144b86fc)), closes [#58](https://github.com/openfga/spring-boot-starter/issues/58)
+* add OpenFGA Testcontainers service connection ([#170](https://github.com/openfga/spring-boot-starter/issues/170)) ([42d93e2](https://github.com/openfga/spring-boot-starter/commit/42d93e23636dbcf34cf56dbd65f1a9a45e317b6e))
+
+
+### Fixed
+
+* support Spring Boot 4 by dropping removed PropertyMapper APIs ([396e9fa](https://github.com/openfga/spring-boot-starter/commit/396e9fa2f47767db056be2c7f978e1bbb51ec30c))
+* support Spring Boot 4 by dropping removed PropertyMapper APIs ([#164](https://github.com/openfga/spring-boot-starter/issues/164)) ([b893624](https://github.com/openfga/spring-boot-starter/commit/b8936249729865385d9c90e9fff864f89a47c018))
+* typo in changelog ([b0bcc4e](https://github.com/openfga/spring-boot-starter/commit/b0bcc4e7fbe6603912c2a23b0a28b295151c8b40))
+
+
+### Documentation
+
+* clarify activation in autoconfig javadoc, pin testcontainers image in README ([54de65c](https://github.com/openfga/spring-boot-starter/commit/54de65cafac30ccf5c1ec0af09e154495dc5f506))
+
+
+### Miscellaneous
+
+* release 0.3.2 ([a113d7d](https://github.com/openfga/spring-boot-starter/commit/a113d7d70cf02ecb1c8e45ca436aeab9e2793d21))
+
 ## v0.3.1
 
 ### [0.3.1](https://github.com/openfga/spring-boot-starter/releases/tag/v0.3.1) (2026-03-31)
