@@ -83,6 +83,7 @@ spotless {
     }
     flexmark {
         target "*.md"
+        targetExclude "CHANGELOG.md"
         flexmark()
     }
 }
