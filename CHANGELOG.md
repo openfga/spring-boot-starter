@@ -15,7 +15,7 @@
 * clarify activation in autoconfig javadoc, pin testcontainers image in README ([54de65c](https://github.com/openfga/spring-boot-starter/commit/54de65cafac30ccf5c1ec0af09e154495dc5f506))
 
 > [!NOTE]  
-> This is bumped to v0.3.3 from v0.3.1 directly because of some bugs in the release pipeline.
+> The starter artifact version is bumped from v0.3.1 to v0.3.3 due to issues in the release pipeline.
 
 
 ## v0.3.1
