@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.2](https://github.com/openfga/spring-boot-starter/compare/v0.3.1...v0.3.2) (2026-07-20)
+
+### Added
+
+* add OpenFGA Testcontainers service connection ([#170](https://github.com/openfga/spring-boot-starter/issues/170)) ([42d93e2](https://github.com/openfga/spring-boot-starter/commit/42d93e23636dbcf34cf56dbd65f1a9a45e317b6e))
+
+### Fixed
+
+* support Spring Boot 4 by dropping removed PropertyMapper APIs ([#164](https://github.com/openfga/spring-boot-starter/issues/164)) ([b893624](https://github.com/openfga/spring-boot-starter/commit/b8936249729865385d9c90e9fff864f89a47c018))
+
+### Documentation
+
+* clarify activation in autoconfig javadoc, pin testcontainers image in README ([54de65c](https://github.com/openfga/spring-boot-starter/commit/54de65cafac30ccf5c1ec0af09e154495dc5f506))
+
 ## v0.3.1
 
 ### [0.3.1](https://github.com/openfga/spring-boot-starter/releases/tag/v0.3.1) (2026-03-31)
