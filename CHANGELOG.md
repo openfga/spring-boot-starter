@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.3](https://github.com/openfga/spring-boot-starter/compare/v0.3.2...v0.3.3) (2026-07-22)
+
+
+### Miscellaneous
+
+* release 0.3.3 ([21e38ce](https://github.com/openfga/spring-boot-starter/commit/21e38cec318c77b3c9cf37d4a0e7edc6bc5c658a))
+
 ## [0.3.2](https://github.com/openfga/spring-boot-starter/compare/v0.3.1...v0.3.2) (2026-07-20)
 
 ### Added
