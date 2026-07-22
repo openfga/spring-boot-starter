@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.3.2](https://github.com/openfga/spring-boot-starter/compare/v0.3.1...v0.3.2) (2026-07-20)
+## [0.3.3](https://github.com/openfga/spring-boot-starter/compare/v0.3.1...v0.3.3) (2026-07-22)
 
 ### Added
 
@@ -13,6 +13,9 @@
 ### Documentation
 
 * clarify activation in autoconfig javadoc, pin testcontainers image in README ([54de65c](https://github.com/openfga/spring-boot-starter/commit/54de65cafac30ccf5c1ec0af09e154495dc5f506))
+
+> [!NOTE]  
+> The starter artifact version is bumped from v0.3.1 to v0.3.3 due to issues in the release pipeline.
 
 ## v0.3.1
 
