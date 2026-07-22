@@ -17,7 +17,6 @@
 > [!NOTE]  
 > The starter artifact version is bumped from v0.3.1 to v0.3.3 due to issues in the release pipeline.
 
-
 ## v0.3.1
 
 ### [0.3.1](https://github.com/openfga/spring-boot-starter/releases/tag/v0.3.1) (2026-03-31)
