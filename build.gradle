@@ -16,7 +16,7 @@ plugins {
 apply from: 'publish.gradle'
 
 group = 'dev.openfga'
-version = '0.3.1'
+version = '0.3.1' // x-release-please-version
 
 java {
     sourceCompatibility = 17

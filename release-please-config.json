@@ -25,6 +25,7 @@
       ],
       "extra-files": [
         { "type": "generic", "path": "build.gradle" },
+        { "type": "generic", "path": "publish.gradle" },
         { "type": "generic", "path": "README.md" },
         { "type": "generic", "path": "examples/servlet/build.gradle" }
       ]
