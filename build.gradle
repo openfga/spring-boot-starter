@@ -24,8 +24,9 @@ wrapper {
 }
 
 java {
-    sourceCompatibility = 17
-    targetCompatibility = 17
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 
     withJavadocJar()
     withSourcesJar()
@@ -72,6 +73,7 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport // report is always generated after tests run
 }
 
 spotless {
@@ -93,10 +95,6 @@ spotless {
         targetExclude "CHANGELOG.md"
         flexmark()
     }
-}
-
-test {
-    finalizedBy jacocoTestReport // report is always generated after tests run
 }
 
 jacocoTestReport {
