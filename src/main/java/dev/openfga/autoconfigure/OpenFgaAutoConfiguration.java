@@ -211,7 +211,7 @@ public class OpenFgaAutoConfiguration {
 
     private static ObjectMapper createDefaultObjectMapper() {
         var mapper = new ObjectMapper();
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
