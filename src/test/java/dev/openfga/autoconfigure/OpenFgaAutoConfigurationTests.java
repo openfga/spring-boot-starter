@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import dev.openfga.sdk.api.configuration.BaseConfiguration;
 import dev.openfga.sdk.api.configuration.ClientConfiguration;
 import dev.openfga.sdk.api.configuration.CredentialsMethod;
 import java.time.Duration;
@@ -75,7 +76,7 @@ class OpenFgaAutoConfigurationTests {
                 .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
                 .run(context -> {
                     assertThat(context.containsBean("fgaClient"), is(true));
-                    ClientConfiguration config = (ClientConfiguration) context.getBean("fgaConfig");
+                    BaseConfiguration config = (ClientConfiguration) context.getBean("fgaConfig");
                     assertThat(config.getApiUrl(), is("https://from-connection-details"));
                 });
     }
@@ -87,7 +88,7 @@ class OpenFgaAutoConfigurationTests {
                 .withBean(OpenFgaConnectionDetails.class, () -> () -> "https://from-connection-details")
                 .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
                 .run(context -> {
-                    ClientConfiguration config = (ClientConfiguration) context.getBean("fgaConfig");
+                    BaseConfiguration config = (ClientConfiguration) context.getBean("fgaConfig");
                     assertThat(config.getApiUrl(), is("https://from-connection-details"));
                 });
     }
