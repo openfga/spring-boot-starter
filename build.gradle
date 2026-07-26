@@ -48,12 +48,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot'
     implementation 'org.springframework.boot:spring-boot-autoconfigure'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-json'
+    implementation "org.openapitools:jackson-databind-nullable:${jacksonDatabindNullableVersion}"
 
     api "dev.openfga:openfga-sdk:${openfgaSdkVersion}"
-
-    compileOnly 'com.fasterxml.jackson.core:jackson-databind'
-    compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-    compileOnly "org.openapitools:jackson-databind-nullable:${jacksonDatabindNullableVersion}"
 
     // Optional Testcontainers @ServiceConnection support. Only needed when consumers opt in to
     // Testcontainers in their tests; the connection-details factory is skipped if these are absent.
