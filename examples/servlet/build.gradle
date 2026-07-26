@@ -1,12 +1,18 @@
 plugins {
-    id 'java'
+    id 'wrapper'
+    id 'java-library'
     id 'org.springframework.boot' version '3.5.16'
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
+wrapper {
+    gradleVersion = '9.6.1'
+}
+
 java {
-    sourceCompatibility = 17
-    targetCompatibility = 17
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 repositories {
@@ -15,12 +21,20 @@ repositories {
     mavenCentral()
 }
 
+dependencyManagement {
+    imports {
+        mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+    }
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     implementation 'dev.openfga:openfga-spring-boot-starter:0.3.3' // x-release-please-version
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-    testImplementation 'org.testcontainers:openfga:1.21.4'
+    testImplementation 'org.testcontainers:openfga'
 }
