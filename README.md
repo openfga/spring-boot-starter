@@ -120,6 +120,27 @@ openfga:
       scopes: YOUR_SPACE_SEPERATED_SCOPES
 ```
 
+#### Startup Initialization
+
+Optionally write an initial authorization model, and a set of initial tuples, at application startup.
+This is the OpenFGA analogue of Spring Boot's `schema.sql`/`data.sql` database initialization.
+
+```yaml
+# src/main/resources/application.yaml
+
+openfga:
+  api-url: YOUR_FGA_API_URL
+  store-id: YOUR_FGA_STORE_ID
+  initialization:
+    mode: EMBEDDED # default: NEVER
+    model-location: classpath:fga/model.json
+    tuples-location: classpath:fga/tuples.json # optional
+```
+
+The model is written only when the store does not already have one, and the tuples are ensured on
+every startup, so restarts and interrupted initialization are safe. `openfga.store-id` and
+`openfga.initialization.model-location` are required when the mode is `EMBEDDED`.
+
 #### Full Configuration Example
 
 ```yaml
@@ -147,6 +168,10 @@ openfga:
       api-token-issuer: YOUR_API_TOKEN_ISSUER
       api-audience: YOUR_API_AUDIENCE
       scopes: YOUR_SPACE_SEPERATED_SCOPES
+  initialization:
+    mode: EMBEDDED # default: NEVER
+    model-location: classpath:fga/model.json
+    tuples-location: classpath:fga/tuples.json
 ```
 
 ### Configuration Properties
@@ -266,6 +291,26 @@ The OpenFGA Spring Boot Starter can be configured using the following properties
 - **Description**: The scopes required for OAuth2 authentication when the `CLIENT_CREDENTIALS` method is selected.
   Scopes are space-separated.
 - **Example**: `read write`
+
+#### `openfga.initialization.mode`
+
+- **Description**: Whether to write an initial authorization model and tuples at startup.
+- **Possible Values**:
+  - `NEVER` (default): No initialization is performed.
+  - `EMBEDDED`: The configured model, and optional tuples, are written at startup. Requires
+    `openfga.store-id` and `openfga.initialization.model-location`.
+
+#### `openfga.initialization.model-location`
+
+- **Description**: Spring resource location of a JSON `WriteAuthorizationModelRequest` to write when the store has no
+  authorization model. Required when the mode is `EMBEDDED`.
+- **Example**: `classpath:fga/model.json`
+
+#### `openfga.initialization.tuples-location`
+
+- **Description**: Optional Spring resource location of a JSON `ClientWriteRequest` (an object with `writes` and/or
+  `deletes`) applied at startup. Only the changes that are not already applied are written.
+- **Example**: `classpath:fga/tuples.json`
 
 ### Using the `fgaClient` bean
 
