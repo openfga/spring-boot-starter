@@ -19,7 +19,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 class OpenFgaAutoConfigurationTests {
 
-    private final ApplicationContextRunner contextRunner = new ApplicationContextRunner();
+    private ApplicationContextRunner contextRunner = new ApplicationContextRunner();
 
     @Test
     void noBeanConfiguredIfMissingProperties() {
@@ -50,7 +50,8 @@ class OpenFgaAutoConfigurationTests {
                     assertThat(context.containsBean("defaultHttpClientBuilder"), is(true));
                     assertThat(context.containsBean("defaultHttpClientBuilderCustomizer"), is(true));
                     assertThat(context.containsBean("apiClient"), is(true));
-                    final var config = (ClientConfiguration) context.getBean("fgaConfig");
+
+                    var config = (ClientConfiguration) context.getBean("fgaConfig");
                     assertThat(config.getApiUrl(), is("https://fga-api-url"));
                     assertThat(config.getStoreId(), is("store ID"));
                     assertThat(config.getUserAgent(), is("some user agent"));
@@ -76,7 +77,7 @@ class OpenFgaAutoConfigurationTests {
                 .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
                 .run(context -> {
                     assertThat(context.containsBean("fgaClient"), is(true));
-                    final var config = (BaseConfiguration) context.getBean("fgaConfig");
+                    var config = (BaseConfiguration) context.getBean("fgaConfig");
                     assertThat(config.getApiUrl(), is("https://from-connection-details"));
                 });
     }
@@ -88,7 +89,7 @@ class OpenFgaAutoConfigurationTests {
                 .withBean(OpenFgaConnectionDetails.class, () -> () -> "https://from-connection-details")
                 .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
                 .run(context -> {
-                    final BaseConfiguration config = (ClientConfiguration) context.getBean("fgaConfig");
+                    BaseConfiguration config = (ClientConfiguration) context.getBean("fgaConfig");
                     assertThat(config.getApiUrl(), is("https://from-connection-details"));
                 });
     }
@@ -104,7 +105,7 @@ class OpenFgaAutoConfigurationTests {
                         "openfga.credentials.config.api-token=XYZ")
                 .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
                 .run(context -> {
-                    final var config = (ClientConfiguration) context.getBean("fgaConfig");
+                    var config = (ClientConfiguration) context.getBean("fgaConfig");
                     assertThat(config.getApiUrl(), is("https://api.fga.example"));
                     assertThat(config.getAuthorizationModelId(), is("authorization model ID"));
                     assertThat(config.getStoreId(), is("store ID"));
@@ -121,7 +122,7 @@ class OpenFgaAutoConfigurationTests {
                         "openfga.store-id=store ID")
                 .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
                 .run(context -> {
-                    final var config = (ClientConfiguration) context.getBean("fgaConfig");
+                    var config = (ClientConfiguration) context.getBean("fgaConfig");
                     assertThat(config.getApiUrl(), is("https://api.fga.example"));
                     assertThat(config.getAuthorizationModelId(), is("authorization model ID"));
                     assertThat(config.getStoreId(), is("store ID"));
@@ -140,7 +141,7 @@ class OpenFgaAutoConfigurationTests {
                         "openfga.credentials.config.api-token=XYZ")
                 .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
                 .run(context -> {
-                    final var config = (ClientConfiguration) context.getBean("fgaConfig");
+                    var config = (ClientConfiguration) context.getBean("fgaConfig");
                     assertThat(config.getApiUrl(), is("https://api.fga.example"));
                     assertThat(config.getAuthorizationModelId(), is("authorization model ID"));
                     assertThat(config.getStoreId(), is("store ID"));
@@ -165,7 +166,7 @@ class OpenFgaAutoConfigurationTests {
                         "openfga.credentials.config.scopes=SCOPE1 SCOPE2")
                 .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
                 .run(context -> {
-                    final var config = (ClientConfiguration) context.getBean("fgaConfig");
+                    var config = (ClientConfiguration) context.getBean("fgaConfig");
                     assertThat(config.getApiUrl(), is("https://api.fga.example"));
                     assertThat(config.getAuthorizationModelId(), is("authorization model ID"));
                     assertThat(config.getStoreId(), is("store ID"));
@@ -183,7 +184,7 @@ class OpenFgaAutoConfigurationTests {
 
     @Test
     void failsIfApiTokenMethodSetButNoToken() {
-        final var exception = assertThrows(IllegalStateException.class, () -> contextRunner
+        var exception = assertThrows(IllegalStateException.class, () -> contextRunner
                 .withPropertyValues(
                         "openfga.api-url=https://api.fga.example",
                         "openfga.authorization-model-id=authorization model ID",
@@ -199,7 +200,7 @@ class OpenFgaAutoConfigurationTests {
 
     @Test
     void failsIfClientCredentialsMethodSetButNotConfigured() {
-        final var exception = assertThrows(IllegalStateException.class, () -> contextRunner
+        var exception = assertThrows(IllegalStateException.class, () -> contextRunner
                 .withPropertyValues(
                         "openfga.api-url=https://api.fga.example",
                         "openfga.authorization-model-id=authorization model ID",
@@ -216,7 +217,7 @@ class OpenFgaAutoConfigurationTests {
 
     @Test
     void failsIfCredentialsWithNoMethod() {
-        final var exception = assertThrows(IllegalStateException.class, () -> contextRunner
+        var exception = assertThrows(IllegalStateException.class, () -> contextRunner
                 .withPropertyValues(
                         "openfga.api-url=https://api.fga.example",
                         "openfga.authorization-model-id=authorization model ID",
@@ -243,7 +244,7 @@ class OpenFgaAutoConfigurationTests {
 
     @Test
     void failsIfReadTimeoutIsNegative() {
-        final var exception = assertThrows(IllegalStateException.class, () -> contextRunner
+        var exception = assertThrows(IllegalStateException.class, () -> contextRunner
                 .withPropertyValues(
                         "openfga.api-url=https://api.fga.example",
                         "openfga.authorization-model-id=authorization model ID",
@@ -257,7 +258,7 @@ class OpenFgaAutoConfigurationTests {
 
     @Test
     void failsIfConnectTimeoutIsNegative() {
-        final var exception = assertThrows(IllegalStateException.class, () -> contextRunner
+        var exception = assertThrows(IllegalStateException.class, () -> contextRunner
                 .withPropertyValues(
                         "openfga.api-url=https://api.fga.example",
                         "openfga.authorization-model-id=authorization model ID",
@@ -271,7 +272,7 @@ class OpenFgaAutoConfigurationTests {
 
     @Test
     void failsIfMinimumRetryDelayIsNegative() {
-        final var exception = assertThrows(IllegalStateException.class, () -> contextRunner
+        var exception = assertThrows(IllegalStateException.class, () -> contextRunner
                 .withPropertyValues(
                         "openfga.api-url=https://api.fga.example",
                         "openfga.authorization-model-id=authorization model ID",
@@ -285,7 +286,7 @@ class OpenFgaAutoConfigurationTests {
 
     @Test
     void failsIfMaxRetriesIsNegative() {
-        final var exception = assertThrows(IllegalStateException.class, () -> contextRunner
+        var exception = assertThrows(IllegalStateException.class, () -> contextRunner
                 .withPropertyValues(
                         "openfga.api-url=https://api.fga.example",
                         "openfga.authorization-model-id=authorization model ID",
@@ -299,7 +300,7 @@ class OpenFgaAutoConfigurationTests {
 
     @Test
     void failsIfMaxRetriesIsPositiveButMinimumRetryDelayIsNotSet() {
-        final var exception = assertThrows(IllegalStateException.class, () -> contextRunner
+        var exception = assertThrows(IllegalStateException.class, () -> contextRunner
                 .withPropertyValues(
                         "openfga.api-url=https://api.fga.example",
                         "openfga.authorization-model-id=authorization model ID",
