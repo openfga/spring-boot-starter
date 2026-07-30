@@ -64,6 +64,7 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.hamcrest:hamcrest'
     testImplementation 'org.mockito:mockito-core'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind'
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.testcontainers:openfga'
