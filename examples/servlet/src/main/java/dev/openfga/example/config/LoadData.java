@@ -79,7 +79,7 @@ public class LoadData {
                                         .relation("viewer")
                                         ._object("document:1"))),
                         new ClientWriteOptions()
-                                .disableTransactions(true)
+                                .transactions(false)
                                 .authorizationModelId(authorizationModel.getAuthorizationModelId()))
                 .get();
         logger.debug("Done Writing Tuples");

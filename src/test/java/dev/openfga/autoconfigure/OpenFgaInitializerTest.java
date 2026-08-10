@@ -1,7 +1,6 @@
 package dev.openfga.autoconfigure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -155,7 +154,7 @@ class OpenFgaInitializerTest {
         var writeOptionsCaptor = ArgumentCaptor.forClass(ClientWriteOptions.class);
         verify(fgaClient).write(any(), writeOptionsCaptor.capture());
         assertEquals("01H...", writeOptionsCaptor.getValue().getAuthorizationModelId());
-        assertFalse(writeOptionsCaptor.getValue().disableTransactions());
+        assertTrue(writeOptionsCaptor.getValue().isTransactionsEnabled());
         var readOptionsCaptor = ArgumentCaptor.forClass(ClientReadOptions.class);
         verify(fgaClient).read(any(), readOptionsCaptor.capture());
         assertEquals(
