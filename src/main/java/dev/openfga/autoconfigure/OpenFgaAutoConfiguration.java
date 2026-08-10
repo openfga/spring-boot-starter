@@ -1,7 +1,5 @@
 package dev.openfga.autoconfigure;
 
-import static org.springframework.util.StringUtils.hasText;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,6 +13,7 @@ import dev.openfga.sdk.api.configuration.*;
 import dev.openfga.sdk.errors.FgaInvalidParameterException;
 import java.net.http.HttpClient;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.openapitools.jackson.nullable.JsonNullableModule;
@@ -24,6 +23,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.context.properties.PropertyMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ResourceLoader;
 
@@ -66,61 +66,27 @@ public class OpenFgaAutoConfiguration {
     public ClientConfiguration fgaConfig(
             OpenFgaProperties openFgaProperties, OpenFgaConnectionDetails connectionDetails) {
         var clientConfiguration = new ClientConfiguration();
-
-        var credentials = openFgaProperties.getCredentials();
-        if (credentials != null) {
-            clientConfiguration.credentials(toCredentials(credentials));
-        }
-
-        var apiUrl = connectionDetails.getApiUrl();
-        if (hasText(apiUrl)) {
-            clientConfiguration.apiUrl(apiUrl);
-        }
-
-        var storeId = openFgaProperties.getStoreId();
-        if (hasText(storeId)) {
-            clientConfiguration.storeId(storeId);
-        }
-
-        var authorizationModelId = openFgaProperties.getAuthorizationModelId();
-        if (hasText(authorizationModelId)) {
-            clientConfiguration.authorizationModelId(authorizationModelId);
-        }
-
-        var userAgent = openFgaProperties.getUserAgent();
-        if (hasText(userAgent)) {
-            clientConfiguration.userAgent(userAgent);
-        }
-
-        var readTimeout = openFgaProperties.getReadTimeout();
-        if (readTimeout != null) {
-            clientConfiguration.readTimeout(readTimeout);
-        }
-
-        var connectTimeout = openFgaProperties.getConnectTimeout();
-        if (connectTimeout != null) {
-            clientConfiguration.connectTimeout(connectTimeout);
-        }
-
-        var maxRetries = openFgaProperties.getMaxRetries();
-        if (maxRetries != null) {
-            clientConfiguration.maxRetries(maxRetries);
-        }
-
-        var minimumRetryDelay = openFgaProperties.getMinimumRetryDelay();
-        if (minimumRetryDelay != null) {
-            clientConfiguration.minimumRetryDelay(minimumRetryDelay);
-        }
-
-        var defaultHeaders = openFgaProperties.getDefaultHeaders();
-        if (defaultHeaders != null) {
-            clientConfiguration.defaultHeaders(defaultHeaders);
-        }
-
-        var telemetryConfiguration = openFgaProperties.getTelemetryConfiguration();
-        if (telemetryConfiguration != null) {
-            clientConfiguration.telemetryConfiguration(toTelemetryConfiguration(telemetryConfiguration));
-        }
+        var map = PropertyMapper.get();
+        map.from(openFgaProperties::getCredentials)
+                .when(Objects::nonNull)
+                .to(c -> clientConfiguration.credentials(toCredentials(c)));
+        map.from(connectionDetails::getApiUrl).whenHasText().to(clientConfiguration::apiUrl);
+        map.from(openFgaProperties::getStoreId).whenHasText().to(clientConfiguration::storeId);
+        map.from(openFgaProperties::getAuthorizationModelId)
+                .whenHasText()
+                .to(clientConfiguration::authorizationModelId);
+        map.from(openFgaProperties::getUserAgent).whenHasText().to(clientConfiguration::userAgent);
+        map.from(openFgaProperties::getReadTimeout).when(Objects::nonNull).to(clientConfiguration::readTimeout);
+        map.from(openFgaProperties::getConnectTimeout).when(Objects::nonNull).to(clientConfiguration::connectTimeout);
+        map.from(openFgaProperties::getMaxRetries).when(Objects::nonNull).to(clientConfiguration::maxRetries);
+        map.from(openFgaProperties::getMinimumRetryDelay)
+                .when(Objects::nonNull)
+                .to(clientConfiguration::minimumRetryDelay);
+        map.from(openFgaProperties::getDefaultHeaders).when(Objects::nonNull).to(clientConfiguration::defaultHeaders);
+        map.from(openFgaProperties::getTelemetryConfiguration)
+                .when(Objects::nonNull)
+                .as(OpenFgaAutoConfiguration::toTelemetryConfiguration)
+                .to(clientConfiguration::telemetryConfiguration);
 
         return clientConfiguration;
     }
