@@ -85,8 +85,7 @@ public class OpenFgaAutoConfiguration {
         map.from(openFgaProperties::getDefaultHeaders).when(Objects::nonNull).to(clientConfiguration::defaultHeaders);
         map.from(openFgaProperties::getTelemetryConfiguration)
                 .when(Objects::nonNull)
-                .as(OpenFgaAutoConfiguration::toTelemetryConfiguration)
-                .to(clientConfiguration::telemetryConfiguration);
+                .to(t -> clientConfiguration.telemetryConfiguration(toTelemetryConfiguration(t)));
 
         return clientConfiguration;
     }
