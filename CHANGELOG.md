@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.4.1](https://github.com/openfga/spring-boot-starter/compare/v0.4.0...v0.4.1) (2026-08-12)
+
+
+### Fixed
+
+* correct version-verification regex in verify-version job ([08b1fd3](https://github.com/openfga/spring-boot-starter/commit/08b1fd3479e23217c3434ecfdcc641bf5bdf2014))
+* correct version-verification regex in verify-version job ([#191](https://github.com/openfga/spring-boot-starter/issues/191)) ([c45e6d6](https://github.com/openfga/spring-boot-starter/commit/c45e6d6b6729177fb24a01abf62fb6a04531588c))
+
+
+### Miscellaneous
+
+* release 0.4.1 ([68b6373](https://github.com/openfga/spring-boot-starter/commit/68b6373ded9c7022d9fb9429221913674960a318))
+
 ## [0.4.0](https://github.com/openfga/spring-boot-starter/compare/v0.3.3...v0.4.0) (2026-08-12)
 
 > [!NOTE]
