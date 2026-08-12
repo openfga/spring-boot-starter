@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.4.0](https://github.com/openfga/spring-boot-starter/compare/v0.3.3...v0.4.0) (2026-08-12)
+
+> [!NOTE]
+> This release establishes the Spring Boot 3.4 baseline for the upcoming Jackson 3 / Spring Boot 4 work. Spring Boot 4 is **not yet supported** — the PropertyMapper fix below only removes one binary incompatibility. Progress is tracked in [#184](https://github.com/openfga/spring-boot-starter/issues/184).
+
+### Added
+
+* support contextual tuples and context in checks ([#169](https://github.com/openfga/spring-boot-starter/issues/169)) ([bb47703](https://github.com/openfga/spring-boot-starter/commit/bb477039ac6fc141dd4fe26842a41fb436c5840a))
+* support initial model and tuple loading ([#171](https://github.com/openfga/spring-boot-starter/issues/171)) ([30ebb9d](https://github.com/openfga/spring-boot-starter/commit/30ebb9dbf4304ab33dd3fb2fb14146e288ef54d8))
+
+
+### Fixed
+
+* bump openfga-sdk to 0.9.11 and use transactions() API ([0821c03](https://github.com/openfga/spring-boot-starter/commit/0821c035d39f45bd32dd98651455538524e544ec)), closes [#186](https://github.com/openfga/spring-boot-starter/issues/186)
+* **example:** make sure to use Gradle wrapper 9.6.1 for example ([96a1ca4](https://github.com/openfga/spring-boot-starter/commit/96a1ca413cf4aadb70ab799c04211c1a7895e820)), closes [#183](https://github.com/openfga/spring-boot-starter/issues/183)
+* **example:** use Java plugin instead of 'java-library' ([659f973](https://github.com/openfga/spring-boot-starter/commit/659f97323b2b6cb320762d901aa35f1961835245)), closes [#183](https://github.com/openfga/spring-boot-starter/issues/183)
+* **jackson:** fix deprecation for spring 4.1 baseline with ObjectMapper ([1e67e02](https://github.com/openfga/spring-boot-starter/commit/1e67e0230524947447b4b0dfeff6a903448d1456))
+* **spring-boot:** do not rely on internal property mapper API ([c35bf9d](https://github.com/openfga/spring-boot-starter/commit/c35bf9d50a5a321ece5086225d6f0752ccac6e7d))
+* **spring:** make PropertyMapper usage Spring Boot 4 compatible ([4547db3](https://github.com/openfga/spring-boot-starter/commit/4547db377947b19cbb88139060c6c79ece74d5f9)), closes [#183](https://github.com/openfga/spring-boot-starter/issues/183)
+
+
+### Documentation
+
+* document openfga.initialization properties in README ([e3403b9](https://github.com/openfga/spring-boot-starter/commit/e3403b942886f90db4f2112778af679539e0831d))
+
 ## [0.3.3](https://github.com/openfga/spring-boot-starter/compare/v0.3.1...v0.3.3) (2026-07-22)
 
 ### Added

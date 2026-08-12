@@ -6,7 +6,7 @@ publishing {
             pom {
                 group = 'dev.openfga'
                 name = 'openfga-spring-boot-starter'
-                version = '0.3.3' // x-release-please-version
+                version = '0.4.0' // x-release-please-version
                 description = 'This is the Spring Boot Starter for OpenFGA.'
                 url = 'https://openfga.dev'
                 licenses {
