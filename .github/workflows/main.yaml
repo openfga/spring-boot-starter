@@ -51,8 +51,10 @@ jobs:
         run: |
           TAG_VERSION="${GITHUB_REF#refs/tags/v}"
           MANIFEST_VERSION=$(jq -r '.["."]' .release-please-manifest.json)
-          GRADLE_VERSION=$(grep 'x-release-please-version' build.gradle | grep -oP "'\K[^']+")
-          PUBLISH_VERSION=$(grep 'x-release-please-version' publish.gradle | grep -oP "'\K[^']+")
+          # The (?=') lookahead requires a closing quote, so the trailing
+          # marker comment is not captured as a second match.
+          GRADLE_VERSION=$(grep 'x-release-please-version' build.gradle | grep -oP "'\K[^']+(?=')")
+          PUBLISH_VERSION=$(grep 'x-release-please-version' publish.gradle | grep -oP "'\K[^']+(?=')")
 
           echo "Tag: $TAG_VERSION | Manifest: $MANIFEST_VERSION | build.gradle: $GRADLE_VERSION | publish.gradle: $PUBLISH_VERSION"
 
