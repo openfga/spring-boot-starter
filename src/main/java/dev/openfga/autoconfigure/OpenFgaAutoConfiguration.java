@@ -69,8 +69,7 @@ public class OpenFgaAutoConfiguration {
         var map = PropertyMapper.get();
         map.from(openFgaProperties::getCredentials)
                 .when(Objects::nonNull)
-                .as(OpenFgaAutoConfiguration::toCredentials)
-                .to(clientConfiguration::credentials);
+                .to(c -> clientConfiguration.credentials(toCredentials(c)));
         map.from(connectionDetails::getApiUrl).whenHasText().to(clientConfiguration::apiUrl);
         map.from(openFgaProperties::getStoreId).whenHasText().to(clientConfiguration::storeId);
         map.from(openFgaProperties::getAuthorizationModelId)
@@ -86,8 +85,8 @@ public class OpenFgaAutoConfiguration {
         map.from(openFgaProperties::getDefaultHeaders).when(Objects::nonNull).to(clientConfiguration::defaultHeaders);
         map.from(openFgaProperties::getTelemetryConfiguration)
                 .when(Objects::nonNull)
-                .as(OpenFgaAutoConfiguration::toTelemetryConfiguration)
-                .to(clientConfiguration::telemetryConfiguration);
+                .to(t -> clientConfiguration.telemetryConfiguration(toTelemetryConfiguration(t)));
+
         return clientConfiguration;
     }
 
@@ -178,7 +177,7 @@ public class OpenFgaAutoConfiguration {
 
     private static ObjectMapper createDefaultObjectMapper() {
         var mapper = new ObjectMapper();
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);

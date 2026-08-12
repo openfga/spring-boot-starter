@@ -341,10 +341,7 @@ public class OpenFgaProperties implements InitializingBean {
                     throw new IllegalStateException("'API_TOKEN' credentials method specified, but no token specified");
                 }
             } else if (credentialsMethod == CredentialsMethod.CLIENT_CREDENTIALS) {
-                if (credentialsConfig == null
-                        || !StringUtils.hasText(credentialsConfig.getApiTokenIssuer())
-                        || !StringUtils.hasText(credentialsConfig.getClientId())
-                        || !StringUtils.hasText(credentialsConfig.getClientSecret())) {
+                if (hasNoCredentialsConfig(credentialsConfig)) {
                     throw new IllegalStateException(
                             "'CLIENT_CREDENTIALS' configuration must contain 'client-id', 'client-secret', and 'api-token-issuer'");
                 }
@@ -379,6 +376,13 @@ public class OpenFgaProperties implements InitializingBean {
                 }
             }
         }
+    }
+
+    private static boolean hasNoCredentialsConfig(final CredentialsConfiguration credentialsConfig) {
+        return credentialsConfig == null
+                || !StringUtils.hasText(credentialsConfig.getApiTokenIssuer())
+                || !StringUtils.hasText(credentialsConfig.getClientId())
+                || !StringUtils.hasText(credentialsConfig.getClientSecret());
     }
 
     private static void assertPositivity(Duration duration, String fieldName) {
