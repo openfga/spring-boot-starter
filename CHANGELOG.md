@@ -1,19 +1,7 @@
 # Changelog
 
-## [0.4.1](https://github.com/openfga/spring-boot-starter/compare/v0.4.0...v0.4.1) (2026-08-12)
+## [0.4.1](https://github.com/openfga/spring-boot-starter/compare/v0.3.3...v0.4.1) (2026-08-12)
 
-
-### Fixed
-
-* correct version-verification regex in verify-version job ([08b1fd3](https://github.com/openfga/spring-boot-starter/commit/08b1fd3479e23217c3434ecfdcc641bf5bdf2014))
-* correct version-verification regex in verify-version job ([#191](https://github.com/openfga/spring-boot-starter/issues/191)) ([c45e6d6](https://github.com/openfga/spring-boot-starter/commit/c45e6d6b6729177fb24a01abf62fb6a04531588c))
-
-
-### Miscellaneous
-
-* release 0.4.1 ([68b6373](https://github.com/openfga/spring-boot-starter/commit/68b6373ded9c7022d9fb9429221913674960a318))
-
-## [0.4.0](https://github.com/openfga/spring-boot-starter/compare/v0.3.3...v0.4.0) (2026-08-12)
 
 > [!NOTE]
 > This release establishes the Spring Boot 3.4 baseline for the upcoming Jackson 3 / Spring Boot 4 work. Spring Boot 4 is **not yet supported** — the PropertyMapper fix below only removes one binary incompatibility. Progress is tracked in [#184](https://github.com/openfga/spring-boot-starter/issues/184).
@@ -37,6 +25,7 @@
 ### Documentation
 
 * document openfga.initialization properties in README ([e3403b9](https://github.com/openfga/spring-boot-starter/commit/e3403b942886f90db4f2112778af679539e0831d))
+
 
 ## [0.3.3](https://github.com/openfga/spring-boot-starter/compare/v0.3.1...v0.3.3) (2026-07-22)
 
