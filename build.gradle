@@ -5,7 +5,7 @@ plugins {
     id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
 
     // quality
-    id 'com.diffplug.spotless' version '8.10.0'
+    id 'com.diffplug.spotless' version '8.10.1'
     id 'jacoco'
 
     // Publishing
