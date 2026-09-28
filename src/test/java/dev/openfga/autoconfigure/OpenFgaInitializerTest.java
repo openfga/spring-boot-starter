@@ -1,5 +1,7 @@
 package dev.openfga.autoconfigure;
 
+import static dev.openfga.autoconfigure.OpenFgaInitializer.*;
+import static java.lang.Thread.currentThread;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -11,6 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import dev.openfga.UnitTest;
+import dev.openfga.autoconfigure.OpenFgaInitializer.InitialTupleKey;
 import dev.openfga.sdk.api.client.JsonSerializer;
 import dev.openfga.sdk.api.client.OpenFgaClient;
 import dev.openfga.sdk.api.client.model.ClientReadAuthorizationModelResponse;
@@ -87,9 +90,8 @@ class OpenFgaInitializerTest {
                 .thenReturn(CompletableFuture.completedFuture(response));
     }
 
-    private OpenFgaInitializer.InitialTuples initialTuples() {
-        return new OpenFgaInitializer.InitialTuples(
-                List.of(new OpenFgaInitializer.InitialTupleKey("user:123", "reader", "document:1", null)), null);
+    private InitialTuples initialTuples() {
+        return new InitialTuples(List.of(new InitialTupleKey("user:123", "reader", "document:1", null)), null);
     }
 
     private void stubModelWrite() throws Exception {
@@ -100,9 +102,9 @@ class OpenFgaInitializerTest {
 
     private static void assertInterruptRestored(Executable action) {
         try {
-            Thread.currentThread().interrupt();
+            currentThread().interrupt();
             assertThrows(InterruptedException.class, action);
-            assertTrue(Thread.currentThread().isInterrupted());
+            assertTrue(currentThread().isInterrupted());
         } finally {
             Thread.interrupted();
         }
@@ -140,8 +142,7 @@ class OpenFgaInitializerTest {
         stubResource("classpath:fga/tuples.json", tuples);
         when(jsonSerializer.readValue("{}".getBytes(), WriteAuthorizationModelRequest.class))
                 .thenReturn(new WriteAuthorizationModelRequest());
-        when(jsonSerializer.readValue(tuples, OpenFgaInitializer.InitialTuples.class))
-                .thenReturn(initialTuples());
+        when(jsonSerializer.readValue(tuples, InitialTuples.class)).thenReturn(initialTuples());
         stubTupleRead(List.of());
         stubModelWrite();
         when(fgaClient.write(any(), any(ClientWriteOptions.class)))
@@ -205,8 +206,7 @@ class OpenFgaInitializerTest {
         stubResource("classpath:fga/tuples.json", tuples);
         when(jsonSerializer.readValue("{}".getBytes(), WriteAuthorizationModelRequest.class))
                 .thenReturn(new WriteAuthorizationModelRequest());
-        when(jsonSerializer.readValue(tuples, OpenFgaInitializer.InitialTuples.class))
-                .thenReturn(initialTuples());
+        when(jsonSerializer.readValue(tuples, InitialTuples.class)).thenReturn(initialTuples());
         stubTupleRead(List.of());
         stubModelWrite();
         var failedWrite = new CompletableFuture<ClientWriteResponse>();
@@ -228,8 +228,7 @@ class OpenFgaInitializerTest {
         var tuples = "{\"writes\":[]}".getBytes();
         stubResource("classpath:fga/tuples.json", tuples);
         var initialTuples = initialTuples();
-        when(jsonSerializer.readValue(tuples, OpenFgaInitializer.InitialTuples.class))
-                .thenReturn(initialTuples);
+        when(jsonSerializer.readValue(tuples, InitialTuples.class)).thenReturn(initialTuples);
         var missingTuples = tupleReadResponse(List.of());
         var existingTuple = new Tuple()
                 .key(initialTuples.toClientWriteRequest().getWrites().get(0).asTupleKey());
@@ -288,8 +287,7 @@ class OpenFgaInitializerTest {
         stubResource("classpath:fga/tuples.json", tuples);
         when(jsonSerializer.readValue("{}".getBytes(), WriteAuthorizationModelRequest.class))
                 .thenReturn(new WriteAuthorizationModelRequest());
-        when(jsonSerializer.readValue(tuples, OpenFgaInitializer.InitialTuples.class))
-                .thenReturn(initialTuples());
+        when(jsonSerializer.readValue(tuples, InitialTuples.class)).thenReturn(initialTuples());
         stubTupleRead(List.of());
         stubModelWrite();
         when(fgaClient.write(any(), any(ClientWriteOptions.class))).thenReturn(new CompletableFuture<>());

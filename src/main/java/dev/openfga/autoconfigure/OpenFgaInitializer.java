@@ -192,33 +192,63 @@ public class OpenFgaInitializer implements ApplicationRunner {
                 || (request.getDeletes() != null && !request.getDeletes().isEmpty());
     }
 
+    /**
+     * Represents the initial set of write and delete tuple operations required for initializing an OpenFGA store.
+     * <p>
+     * Holds two lists: one for tuples to be written ({@link InitialTupleKey}) and one for tuples to be deleted
+     * ({@link InitialTupleKeyWithoutCondition}). Provides a method to convert this container into a {@link ClientWriteRequest}
+     * suitable for sending to the OpenFGA client.
+     * <p>
+     * It is an internal helper class needed to replace the functionality that has previously been
+     * provided by the Jackson mixins.
+     */
     record InitialTuples(List<InitialTupleKey> writes, List<InitialTupleKeyWithoutCondition> deletes) {
-
         ClientWriteRequest toClientWriteRequest() {
             var request = new ClientWriteRequest();
+
             if (writes != null) {
                 request.writes(
                         writes.stream().map(InitialTupleKey::toClientTupleKey).toList());
             }
+
             if (deletes != null) {
                 request.deletes(deletes.stream()
                         .map(InitialTupleKeyWithoutCondition::toClientTupleKeyWithoutCondition)
                         .toList());
             }
+
+            logger.trace("Initial load request: {}", request);
             return request;
         }
     }
 
+    /**
+     * Represents a tuple key used for initial authorization data, encapsulating the user, relation, object, and optional condition.
+     * This record provides a mechanism to convert itself into a {@link ClientTupleKey} for interaction with the OpenFGA client.
+     * <p>
+     * This internal class is necessary to overcome the flaw of mapping <code>object</code> json properties into Java properties of name <code>_object</code>.
+     */
     record InitialTupleKey(String user, String relation, String object, ClientRelationshipCondition condition) {
         ClientTupleKey toClientTupleKey() {
             var key = new ClientTupleKey().user(user).relation(relation)._object(object);
+
             if (condition != null) {
                 key.condition(condition);
             }
+
             return key;
         }
     }
 
+    /**
+     * Represents an initial tuple key without a condition, used during authorization model initialization.
+     * <p>
+     * This record serves as an intermediate data structure to hold the essential components of a tuple:
+     * user, relation, and object. It provides conversion capability to a {@link ClientTupleKeyWithoutCondition}
+     * for submission to the OpenFGA client during tuple writes.
+     * <p>
+     * This internal class is necessary to overcome the flaw of mapping <code>object</code> json properties into Java properties of name <code>_object</code>.
+     */
     record InitialTupleKeyWithoutCondition(String user, String relation, String object) {
         ClientTupleKeyWithoutCondition toClientTupleKeyWithoutCondition() {
             return new ClientTupleKeyWithoutCondition()
