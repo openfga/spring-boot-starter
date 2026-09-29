@@ -243,7 +243,7 @@ public class OpenFgaInitializer implements ApplicationRunner {
     /**
      * Represents an initial tuple key without a condition, used during authorization model initialization.
      * <p>
-     * This record serves as an intermediate data structure to hold the essential components of a tuple:
+     * This record serves as an intermediate data structure to hold the essential parts of a tuple:
      * user, relation, and object. It provides conversion capability to a {@link ClientTupleKeyWithoutCondition}
      * for submission to the OpenFGA client during tuple writes.
      * <p>

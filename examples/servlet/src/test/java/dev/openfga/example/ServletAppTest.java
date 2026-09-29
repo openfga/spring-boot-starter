@@ -26,4 +26,6 @@ public class ServletAppTest {
             return container;
         }
     }
+
+    // TODO example: add a real test
 }
