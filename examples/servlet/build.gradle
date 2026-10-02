@@ -1,12 +1,13 @@
 plugins {
     id 'wrapper'
     id 'java'
-    id 'org.springframework.boot' version '3.5.16'
+    id 'org.springframework.boot' version '4.1.1'
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
 wrapper {
-    gradleVersion = '9.6.1'
+    gradleVersion = '9.8.0'
+    distributionSha256Sum = 'bafd5ce9cfaea0fbccfdc8439a1ac42fbd4cd9c89dc9a988228d8a2639a58e6c'
 }
 
 java {
@@ -27,6 +28,7 @@ dependencyManagement {
     }
 }
 
+// TODO example: update for Spring Boot 4 baseline and JsonSerializer usage
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -36,5 +38,10 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-    testImplementation 'org.testcontainers:openfga'
+    testImplementation 'org.testcontainers:testcontainers-openfga:2.0.5'
+}
+
+test {
+    useJUnitPlatform()
+    failOnNoDiscoveredTests = false
 }

@@ -27,7 +27,7 @@ class OpenFgaServiceConnectionTests {
 
     @Container
     @ServiceConnection
-    static OpenFGAContainer openfga = new OpenFGAContainer("openfga/openfga:v1.4.3");
+    static OpenFGAContainer openfga = new OpenFGAContainer("openfga/openfga:v1.21.0");
 
     @Autowired
     OpenFgaConnectionDetails connectionDetails;

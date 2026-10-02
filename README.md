@@ -10,13 +10,13 @@ A Spring Boot Starter for OpenFGA.
 
 [OpenFGA](https://openfga.dev) is an open source Fine-Grained Authorization solution inspired
 by [Google's Zanzibar paper](https://research.google/pubs/pub48190/). It was created by the FGA team
-at [Auth0](https://auth0.com) based on [Auth0 Fine-Grained Authorization (FGA)](https://fga.dev), available
-under [a permissive license (Apache-2)](https://github.com/openfga/rfcs/blob/main/LICENSE) and welcomes community
-contributions.
+at [Auth0](https://auth0.com) based on [Auth0 Fine-Grained Authorization (FGA)](https://fga.dev),
+available under [a permissive license (Apache-2)](https://github.com/openfga/rfcs/blob/main/LICENSE)
+and welcomes community contributions.
 
-OpenFGA is designed to make it easy for application builders to model their permission layer, and to add and integrate
-fine-grained authorization into their applications. OpenFGA’s design is optimized for reliability and low latency at a
-high scale.
+OpenFGA is designed to make it easy for application builders to model their permission layer and to
+add and integrate fine-grained authorization into their applications. OpenFGA is designed to
+optimize reliability and low latency at a high scale.
 
 ## Resources
 
@@ -60,7 +60,14 @@ implementation("dev.openfga:openfga-spring-boot-starter:0.4.1") // x-release-ple
 
 ### Requirements
 
-Java >= 17 and Spring Boot >= 3
+- Java >= 17 and Spring Boot
+
+## Spring Boot compatibility
+
+| OpenFGA starter version | Spring Boot version |
+|-------------------------|---------------------|
+| ≤ `0.4.1`               | Spring Boot `v3`    |
+| unreleased              | Spring Boot `v4`    |
 
 ### Configuring the starter
 
@@ -70,8 +77,8 @@ The configuration properties are used to create
 an [OpenFgaClient](https://github.com/openfga/java-sdk/blob/main/src/main/java/dev/openfga/sdk/api/client/OpenFgaClient.java)
 instance.
 
-To initialize the OpenFGA Spring Boot Starter, please provide the configuration property `openfga.api-url`. An
-`OpenFgaClient` instance will then be created with the provided configuration.
+To initialize the OpenFGA Spring Boot Starter, please provide the configuration property
+`openfga.api-url`. An `OpenFgaClient` instance will then be created with the provided configuration.
 
 The following examples demonstrate how to configure the OpenFGA Spring Boot Starter.
 
@@ -122,8 +129,9 @@ openfga:
 
 #### Startup Initialization
 
-Optionally write an initial authorization model, and a set of initial tuples, at application startup.
-This is the OpenFGA analogue of Spring Boot's `schema.sql`/`data.sql` database initialization.
+Optionally write an initial authorization model, and a set of initial tuples, at application
+startup. This is the OpenFGA analogue of Spring Boot's `schema.sql`/`data.sql` database
+initialization.
 
 ```yaml
 # src/main/resources/application.yaml
@@ -201,25 +209,30 @@ The OpenFGA Spring Boot Starter can be configured using the following properties
 
 #### `openfga.read-timeout`
 
-- **Description**: The maximum duration to wait for a read operation to complete. Default unit is seconds. Must be positive or null.
+- **Description**: The maximum duration to wait for a read operation to complete. The default unit
+  is seconds. Must be positive or null.
 - **Example**: `30s`
 - **Default**: `10s`
 
 #### `openfga.connect-timeout`
 
-- **Description**: The maximum duration to wait for a connection to be established. Default unit is seconds. Must be positive or null.
+- **Description**: The maximum duration to wait for a connection to be established. The default unit
+  is seconds. Must be positive or null.
 - **Example**: `10s`
 - **Default**: `10s`
 
 #### `openfga.max-retries`
 
-- **Description**: The maximum number of retry attempts for failed requests. Must be positive or null. If you set this to a positive value, ensure that you also set the `minimum-retry-delay` property.
+- **Description**: The maximum number of retry attempts for failed requests. Must be positive or
+  null. If you set this to a positive value, ensure that you also set the `minimum-retry-delay`
+  property.
 - **Example**: `5`
 - **Default**: No retries
 
 #### `openfga.minimum-retry-delay`
 
-- **Description**: The minimum delay between retry attempts. Default unit is seconds. Must be positive or null. Only used if `max-retries` is set.
+- **Description**: The minimum delay between retry attempts. The default unit is seconds. Must be
+  positive or null. Only used if `max-retries` is set.
 - **Example**: `500ms`
 - **Default**: `10s`
 
@@ -242,8 +255,8 @@ The OpenFGA Spring Boot Starter can be configured using the following properties
 
 #### `openfga.telemetry-configuration`
 
-- **Description**: Configuration settings for telemetry, which help in monitoring and logging the behavior of the
-  OpenFGA client.
+- **Description**: Configuration settings for telemetry, which help in monitoring and logging the
+  behavior of the OpenFGA client.
 - **Example**:
 
   ```yaml
@@ -261,35 +274,38 @@ The OpenFGA Spring Boot Starter can be configured using the following properties
 
 #### `openfga.credentials.config.api-token`
 
-- **Description**: The API token used for authenticating requests when the `API_TOKEN` method is selected.
+- **Description**: The API token used for authenticating requests when the `API_TOKEN` method is
+  selected.
 - **Example**: `your-api-token`
 
 #### `openfga.credentials.config.client-id`
 
-- **Description**: The client ID used for OAuth2 authentication when the `CLIENT_CREDENTIALS` method is selected.
+- **Description**: The client ID used for OAuth2 authentication when the `CLIENT_CREDENTIALS` method
+  is selected.
 - **Example**: `your-client-id`
 
 #### `openfga.credentials.config.client-secret`
 
-- **Description**: The client secret used for OAuth2 authentication when the `CLIENT_CREDENTIALS` method is selected.
+- **Description**: The client secret used for OAuth2 authentication when the `CLIENT_CREDENTIALS`
+  method is selected.
 - **Example**: `your-client-secret`
 
 #### `openfga.credentials.config.api-token-issuer`
 
-- **Description**: The issuer of the API token used for OAuth2 authentication when the `CLIENT_CREDENTIALS` method is
-  selected.
+- **Description**: The issuer of the API token used for OAuth2 authentication when the
+  `CLIENT_CREDENTIALS` method is selected.
 - **Example**: `https://issuer.example.com`
 
 #### `openfga.credentials.config.api-audience`
 
-- **Description**: The audience for the API token used for OAuth2 authentication when the `CLIENT_CREDENTIALS` method is
-  selected.
+- **Description**: The audience for the API token used for OAuth2 authentication when the
+  `CLIENT_CREDENTIALS` method is selected.
 - **Example**: `https://api.example.com`
 
 #### `openfga.credentials.config.scopes`
 
-- **Description**: The scopes required for OAuth2 authentication when the `CLIENT_CREDENTIALS` method is selected.
-  Scopes are space-separated.
+- **Description**: The scopes required for OAuth2 authentication when the `CLIENT_CREDENTIALS`
+  method is selected. Scopes are space-separated.
 - **Example**: `read write`
 
 #### `openfga.initialization.mode`
@@ -302,19 +318,20 @@ The OpenFGA Spring Boot Starter can be configured using the following properties
 
 #### `openfga.initialization.model-location`
 
-- **Description**: Spring resource location of a JSON `WriteAuthorizationModelRequest` to write when the store has no
-  authorization model. Required when the mode is `EMBEDDED`.
+- **Description**: Spring resource location of a JSON `WriteAuthorizationModelRequest` to write when
+  the store has no authorization model. Required when the mode is `EMBEDDED`.
 - **Example**: `classpath:fga/model.json`
 
 #### `openfga.initialization.tuples-location`
 
-- **Description**: Optional Spring resource location of a JSON `ClientWriteRequest` (an object with `writes` and/or
-  `deletes`) applied at startup. Only the changes that are not already applied are written.
+- **Description**: Optional Spring resource location of a JSON `ClientWriteRequest` (an object with
+  `writes` and/or `deletes`) applied at startup. Only the changes that are not already applied are
+  written.
 - **Example**: `classpath:fga/tuples.json`
 
 ### Using the `fgaClient` bean
 
-Once configured, an `fgaClient` bean is available to be injected into your Spring components:
+Once configured, an `fgaClient` bean can be injected into your Spring components:
 
 ```java
 
@@ -326,7 +343,7 @@ public class MyService {
 }
 ```
 
-This can be used to interact with the FGA API, for example to write authorization data:
+This can be used to interact with the FGA API, for example, to write authorization data:
 
 ```java
 // field injection just for briefness
@@ -357,8 +374,8 @@ public Document createDoc(String id) {
 
 ### Using the `fga` bean
 
-The starter also creates an `fga` bean, which can be used in conjunction with Spring Security's method
-security to protect access to resources using FGA:
+The starter also creates an `fga` bean, which can be used in conjunction with Spring Security's
+method security to protect access to resources using FGA:
 
 ```java
 // Method body will only execute if the FGA check returns true. 403 otherwise.
@@ -384,15 +401,17 @@ public Document getDocument(@PathVariable String docId) {
 To customize the `ApiClient` configuration, create a `@Bean` method in your Spring Boot application:
 
 ```java
+
 @Bean
-public ApiClient apiClient(HttpClient.Builder builder, ObjectMapper mapper) {
-    return new ApiClient(httpClientBuilder, objectMapper);
+public ApiClient apiClient(HttpClient.Builder builder, JsonSerializer jsonSerializer) {
+    return new ApiClient(builder, jsonSerializer);
 }
 ```
 
 Similarly, to customize the `HttpClient.Builder`:
 
 ```java
+
 @Bean
 public HttpClient.Builder httpClientBuilder() {
     return HttpClient.newBuilder()
@@ -402,13 +421,15 @@ public HttpClient.Builder httpClientBuilder() {
 
 ## Testing with Testcontainers
 
-The starter ships a Spring Boot [`@ServiceConnection`](https://docs.spring.io/spring-boot/reference/testing/testcontainers.html#testing.testcontainers.service-connections)
+The starter ships a Spring Boot
+[`@ServiceConnection`](https://docs.spring.io/spring-boot/reference/testing/testcontainers.html#testing.testcontainers.service-connections)
 for OpenFGA. When the optional `org.springframework.boot:spring-boot-testcontainers` and
-`org.testcontainers:openfga` dependencies are on the test classpath, an `OpenFGAContainer` annotated
-with `@ServiceConnection` is automatically mapped into the Spring environment, so no `openfga.api-url`
-property is required in tests:
+`org.testcontainers:testcontainers-openfga` dependencies are on the test classpath, an `OpenFGAContainer` annotated
+with `@ServiceConnection` is automatically mapped into the Spring environment, so no
+`openfga.api-url` property is required in tests:
 
 ```java
+
 @SpringBootTest
 @Testcontainers(disabledWithoutDocker = true)
 class MyOpenFgaTests {
@@ -424,7 +445,7 @@ class MyOpenFgaTests {
 }
 ```
 
-The container's HTTP endpoint is supplied to the auto-configured `OpenFgaClient` via an
+The container's HTTP endpoint is supplied to the autoconfigured `OpenFgaClient` via an
 `OpenFgaConnectionDetails` bean. Defining your own `OpenFgaConnectionDetails` bean (or the standard
 `openfga.api-url` property) continues to work and takes precedence when no service connection is
 present.
@@ -433,14 +454,13 @@ present.
 
 ### Issues
 
-If you have found a bug or if you have a feature request,
-please [create an issue](https://github.com/openfga/fga-spring-boot/issues). Please do not report security
-vulnerabilities on the public GitHub issue tracker.
+If you have found a bug or if you have a feature request, please [create an issue](https://github.com/openfga/fga-spring-boot/issues). Please do
+not report security vulnerabilities on the public GitHub issue tracker.
 
 ### Pull Requests
 
-Pull requests are welcome, however, we do kindly ask that for non-trivial changes or feature additions, that you create
-an [issue]((https://github.com/openfga/fga-spring-boot/issues)) first.
+Pull requests are welcome, however, we do kindly ask that for non-trivial changes or feature
+additions that you create an [issue]((https://github.com/openfga/fga-spring-boot/issues)) first.
 
 ## Author
 
@@ -448,5 +468,4 @@ an [issue]((https://github.com/openfga/fga-spring-boot/issues)) first.
 
 ## License
 
-This project is licensed under the Apache-2.0 license. See
-the [LICENSE](https://github.com/openfga/fga-spring-boot/blob/main/LICENSE) file for more info.
+This project is licensed under the Apache-2.0 license. See the [LICENSE](https://github.com/openfga/fga-spring-boot/blob/main/LICENSE) file for more info.

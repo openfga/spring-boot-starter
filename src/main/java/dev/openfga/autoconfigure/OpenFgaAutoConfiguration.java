@@ -1,13 +1,9 @@
 package dev.openfga.autoconfigure;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import dev.openfga.OpenFga;
 import dev.openfga.OpenFgaExceptionHandler;
 import dev.openfga.sdk.api.client.ApiClient;
+import dev.openfga.sdk.api.client.JsonSerializer;
 import dev.openfga.sdk.api.client.OpenFgaClient;
 import dev.openfga.sdk.api.configuration.*;
 import dev.openfga.sdk.errors.FgaInvalidParameterException;
@@ -16,7 +12,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.openapitools.jackson.nullable.JsonNullableModule;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -154,7 +149,7 @@ public class OpenFgaAutoConfiguration {
      * Creates an {@link ApiClient} bean if none exists.
      *
      * @param httpClientBuilderProvider provides the {@link HttpClient.Builder} bean
-     * @param objectMapperProvider provides the {@link ObjectMapper} bean
+     * @param jsonSerializerProvider provides the {@link JsonSerializer} bean
      * @param httpClientBuilderCustomizer customizes the {@link HttpClient.Builder}
      * @return the configured {@link ApiClient} bean
      */
@@ -162,31 +157,23 @@ public class OpenFgaAutoConfiguration {
     @ConditionalOnMissingBean
     public ApiClient apiClient(
             ObjectProvider<HttpClient.Builder> httpClientBuilderProvider,
-            ObjectProvider<ObjectMapper> objectMapperProvider,
+            ObjectProvider<JsonSerializer> jsonSerializerProvider,
             HttpClientBuilderCustomizer httpClientBuilderCustomizer) {
 
-        if ((httpClientBuilderProvider.getIfAvailable() == null) && (objectMapperProvider.getIfAvailable() == null)) {
+        if ((httpClientBuilderProvider.getIfAvailable() == null) && (jsonSerializerProvider.getIfAvailable() == null)) {
             return new ApiClient();
         }
+
         var httpClientBuilder = httpClientBuilderProvider.getIfAvailable(HttpClient::newBuilder);
         httpClientBuilderCustomizer.customize(httpClientBuilder);
+
         return new ApiClient(
                 httpClientBuilder,
-                objectMapperProvider.getIfAvailable(OpenFgaAutoConfiguration::createDefaultObjectMapper));
+                jsonSerializerProvider.getIfAvailable(OpenFgaAutoConfiguration::createDefaultJsonSerializer));
     }
 
-    private static ObjectMapper createDefaultObjectMapper() {
-        var mapper = new ObjectMapper();
-        mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        mapper.configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        mapper.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
-        mapper.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
-        mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
-        mapper.registerModule(new JavaTimeModule());
-        mapper.registerModule(new JsonNullableModule());
-        return mapper;
+    private static JsonSerializer createDefaultJsonSerializer() {
+        return JsonSerializer.createDefault();
     }
 
     /**
@@ -225,7 +212,7 @@ public class OpenFgaAutoConfiguration {
      *
      * @param openFgaClient the {@link OpenFgaClient} bean
      * @param openFgaProperties the configuration properties for OpenFGA
-     * @param objectMapperProvider provides the {@link ObjectMapper} bean
+     * @param jsonSerializerProvider provides the {@link JsonSerializer} bean
      * @param resourceLoader the {@link ResourceLoader} used to resolve the configured locations
      * @return the {@link OpenFgaInitializer} bean
      */
@@ -235,11 +222,12 @@ public class OpenFgaAutoConfiguration {
     public OpenFgaInitializer openFgaInitializer(
             OpenFgaClient openFgaClient,
             OpenFgaProperties openFgaProperties,
-            ObjectProvider<ObjectMapper> objectMapperProvider,
+            ObjectProvider<JsonSerializer> jsonSerializerProvider,
             ResourceLoader resourceLoader) {
-        var objectMapper = objectMapperProvider.getIfAvailable(OpenFgaAutoConfiguration::createDefaultObjectMapper);
+        var jsonSerializer =
+                jsonSerializerProvider.getIfAvailable(OpenFgaAutoConfiguration::createDefaultJsonSerializer);
         return new OpenFgaInitializer(
-                openFgaClient, openFgaProperties.getInitialization(), resourceLoader, objectMapper);
+                openFgaClient, openFgaProperties.getInitialization(), resourceLoader, jsonSerializer);
     }
 
     /**
