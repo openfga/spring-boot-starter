@@ -1,0 +1,159 @@
+{
+  "groups": [
+    {
+      "name": "openfga",
+      "type": "dev.openfga.autoconfigure.OpenFgaProperties",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties"
+    },
+    {
+      "name": "openfga.credentials",
+      "type": "dev.openfga.autoconfigure.OpenFgaProperties$Credentials",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties",
+      "sourceMethod": "public dev.openfga.autoconfigure.OpenFgaProperties.Credentials getCredentials() "
+    },
+    {
+      "name": "openfga.credentials.config",
+      "type": "dev.openfga.autoconfigure.OpenFgaProperties$CredentialsConfiguration",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties$Credentials",
+      "sourceMethod": "public dev.openfga.autoconfigure.OpenFgaProperties.CredentialsConfiguration getConfig() "
+    },
+    {
+      "name": "openfga.initialization",
+      "type": "dev.openfga.autoconfigure.OpenFgaProperties$Initialization",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties",
+      "sourceMethod": "public dev.openfga.autoconfigure.OpenFgaProperties.Initialization getInitialization() "
+    }
+  ],
+  "properties": [
+    {
+      "name": "openfga.api-url",
+      "type": "java.lang.String",
+      "description": "URL to OpenFGA instance. If configured, beans will be initialized.",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties"
+    },
+    {
+      "name": "openfga.authorization-model-id",
+      "type": "java.lang.String",
+      "description": "The ID of the authorization model to use.",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties"
+    },
+    {
+      "name": "openfga.connect-timeout",
+      "type": "java.time.Duration",
+      "description": "The connect timeout for requests. Default unit is seconds. Defaults to 10 seconds.",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties"
+    },
+    {
+      "name": "openfga.credentials.config.api-audience",
+      "type": "java.lang.String",
+      "description": "The API audience. If configured and if {@code CLIENT_CREDENTIALS} is used, the client will use this audience to obtain an access token.",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties$CredentialsConfiguration"
+    },
+    {
+      "name": "openfga.credentials.config.api-token",
+      "type": "java.lang.String",
+      "description": "The API token used to authenticate the client at OpenFGA. Required, if {@code API_TOKEN} method should be used.",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties$CredentialsConfiguration"
+    },
+    {
+      "name": "openfga.credentials.config.api-token-issuer",
+      "type": "java.lang.String",
+      "description": "The API token issuer, used as an additional check. Required, if {@code CLIENT_CREDENTIALS} method should be used.",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties$CredentialsConfiguration"
+    },
+    {
+      "name": "openfga.credentials.config.client-id",
+      "type": "java.lang.String",
+      "description": "The OAuth2 client ID. Required, if {@code CLIENT_CREDENTIALS} method should be used.",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties$CredentialsConfiguration"
+    },
+    {
+      "name": "openfga.credentials.config.client-secret",
+      "type": "java.lang.String",
+      "description": "The OAuth2 client secret. Required, if {@code CLIENT_CREDENTIALS} method should be used.",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties$CredentialsConfiguration"
+    },
+    {
+      "name": "openfga.credentials.config.scopes",
+      "type": "java.lang.String",
+      "description": "Space seperated list of OAuth2 scopes used to obtain an access token.",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties$CredentialsConfiguration"
+    },
+    {
+      "name": "openfga.credentials.method",
+      "type": "dev.openfga.autoconfigure.OpenFgaProperties$CredentialsMethod",
+      "description": "The authentication method to use for the OpenFGA client.",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties$Credentials"
+    },
+    {
+      "name": "openfga.default-headers",
+      "type": "java.util.Map<java.lang.String,java.lang.String>",
+      "description": "The default headers to use for requests.",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties"
+    },
+    {
+      "name": "openfga.http-version",
+      "type": "dev.openfga.autoconfigure.HttpVersion",
+      "description": "The HTTP version to use for requests. Default is HTTP version 2",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties"
+    },
+    {
+      "name": "openfga.initialization.mode",
+      "type": "dev.openfga.autoconfigure.OpenFgaProperties$InitializationMode",
+      "description": "Whether to perform OpenFGA initialization at startup. Defaults to {@link InitializationMode#NEVER}.",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties$Initialization"
+    },
+    {
+      "name": "openfga.initialization.model-location",
+      "type": "java.lang.String",
+      "description": "Location of the authorization model to write, as a Spring resource path (e.g. {@code classpath:fga\/model.json}). The resource must contain a JSON {@code WriteAuthorizationModelRequest}. Required when {@link #mode} is {@code EMBEDDED}.",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties$Initialization"
+    },
+    {
+      "name": "openfga.initialization.tuples-location",
+      "type": "java.lang.String",
+      "description": "Optional location of the initial tuples to write, as a Spring resource path (e.g. {@code classpath:fga\/tuples.json}). The resource must contain a JSON {@code ClientWriteRequest}.",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties$Initialization"
+    },
+    {
+      "name": "openfga.max-retries",
+      "type": "java.lang.Integer",
+      "description": "The maximum number of retries to attempt. Defaults to no retries. If you set this to a positive value, ensure that you also set the {@link OpenFgaProperties#minimumRetryDelay} property.",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties"
+    },
+    {
+      "name": "openfga.minimum-retry-delay",
+      "type": "java.time.Duration",
+      "description": "The maximum delay between retries. Default unit is seconds. Must be set if {@link OpenFgaProperties#maxRetries} is set.",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties"
+    },
+    {
+      "name": "openfga.read-timeout",
+      "type": "java.time.Duration",
+      "description": "The read timeout for request. Default unit is seconds. Defaults to 10 seconds.",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties"
+    },
+    {
+      "name": "openfga.store-id",
+      "type": "java.lang.String",
+      "description": "The ID of the store to use.",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties"
+    },
+    {
+      "name": "openfga.telemetry-configuration",
+      "type": "java.util.Map<dev.openfga.autoconfigure.TelemetryMetric,java.util.Map<dev.openfga.autoconfigure.TelemetryAttribute,java.lang.Object>>",
+      "description": "The telemetry configuration for the client. See {@link TelemetryMetric} and {@link TelemetryAttribute} as well as <a href=\"https:\/\/openfga.dev\/docs\/getting-started\/configure-telemetry\">Configure SDK Client Telemetry<\/a>",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties"
+    },
+    {
+      "name": "openfga.user-agent",
+      "type": "java.lang.String",
+      "description": "The HTTP user agent header to use for requests, default openfga-sdk java\/version",
+      "sourceType": "dev.openfga.autoconfigure.OpenFgaProperties"
+    }
+  ],
+  "hints": [],
+  "ignored": {
+    "properties": []
+  }
+}
