@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+// TODO example: do not use ObjectMapper any more
 @Configuration
 public class LoadData {
 
