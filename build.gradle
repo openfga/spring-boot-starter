@@ -3,7 +3,7 @@ plugins {
     id 'java-library'
     id 'org.springframework.boot' version "${springBootVersion}" apply false
     id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
-
+    
     // quality
     id 'com.diffplug.spotless' version '8.10.2'
     id 'jacoco'
@@ -27,7 +27,6 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
     }
-
     withJavadocJar()
     withSourcesJar()
 }
@@ -44,14 +43,16 @@ dependencyManagement {
 
 dependencies {
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-
+    
     implementation 'org.springframework.boot:spring-boot'
     implementation 'org.springframework.boot:spring-boot-autoconfigure'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    
+    // Migrado para Jackson 3 conforme requisitos da Issue #184 / Spring Boot 4
+    implementation 'tools.jackson.core:jackson-databind'
+    implementation 'tools.jackson.datatype:jackson-datatype-jsr310'
+    
     implementation "org.openapitools:jackson-databind-nullable:${jacksonDatabindNullableVersion}"
-
     api "dev.openfga:openfga-sdk:${openfgaSdkVersion}"
 
     // Optional Testcontainers @ServiceConnection support. Only needed when consumers opt in to
@@ -60,12 +61,12 @@ dependencies {
     compileOnly "org.testcontainers:openfga:${testcontainersVersion}"
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.hamcrest:hamcrest'
     testImplementation 'org.mockito:mockito-core'
-    testImplementation 'com.fasterxml.jackson.core:jackson-databind'
+    
+    testImplementation 'tools.jackson.core:jackson-databind'
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation "org.testcontainers:junit-jupiter:${testcontainersVersion}"
     testImplementation "org.testcontainers:openfga:${testcontainersVersion}"
