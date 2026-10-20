@@ -1,6 +1,6 @@
 services:
   openfga:
-    image: openfga/openfga:latest
+    image: openfga/openfga:v1.21.0
     command: run
     ports:
       - "4000:8080"
