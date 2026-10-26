@@ -86,7 +86,9 @@ spotless {
         endWithNewline()
     }
     java {
-        palantirJavaFormat()
+        // Pinned: Spotless 8.10.3 changed the default to 2.98.0, which reformats code.
+        // Dependabot does not track this version; bump it deliberately and run spotlessApply.
+        palantirJavaFormat('2.80.0')
         removeUnusedImports()
         importOrder()
     }
