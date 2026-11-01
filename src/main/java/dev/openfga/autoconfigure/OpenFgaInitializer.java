@@ -38,6 +38,7 @@ import org.springframework.util.StringUtils;
 public class OpenFgaInitializer implements ApplicationRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(OpenFgaInitializer.class);
+    private static final JsonSerializer TUPLE_JSON_SERIALIZER = JsonSerializer.createDefault();
 
     private final OpenFgaClient fgaClient;
     private final OpenFgaProperties.Initialization initialization;
@@ -50,7 +51,7 @@ public class OpenFgaInitializer implements ApplicationRunner {
      * @param fgaClient the {@link OpenFgaClient} to write the model and tuples with
      * @param initialization the initialization properties
      * @param resourceLoader the {@link ResourceLoader} used to resolve the configured locations
-     * @param jsonSerializer the {@link JsonSerializer} used to deserialize the model and tuples
+     * @param jsonSerializer the {@link JsonSerializer} used to deserialize the authorization model
      */
     public OpenFgaInitializer(
             OpenFgaClient fgaClient,
@@ -116,7 +117,7 @@ public class OpenFgaInitializer implements ApplicationRunner {
                     "OpenFGA initial tuples location does not exist: " + initialization.getTuplesLocation());
         }
 
-        var requestedTuples = jsonSerializer
+        var requestedTuples = TUPLE_JSON_SERIALIZER
                 .readValue(resource.getContentAsByteArray(), InitialTuples.class)
                 .toClientWriteRequest();
         var pendingTuples = pendingTuples(requestedTuples);
@@ -192,6 +193,39 @@ public class OpenFgaInitializer implements ApplicationRunner {
                 || (request.getDeletes() != null && !request.getDeletes().isEmpty());
     }
 
+    private static List<String> formatWrites(List<ClientTupleKey> tuples) {
+        if (tuples == null) {
+            return List.of();
+        }
+
+        return tuples.stream().map(OpenFgaInitializer::formatTupleWithCondition).toList();
+    }
+
+    private static @NonNull String formatTupleWithCondition(ClientTupleKey tuple) {
+        String formattedTuple = formatTuple(tuple.getUser(), tuple.getRelation(), tuple.getObject());
+
+        var condition = tuple.getCondition();
+        if (condition != null) {
+            formattedTuple += ", condition=%s, context=%s".formatted(condition.getName(), condition.getContext());
+        }
+
+        return formattedTuple;
+    }
+
+    private static List<String> formatDeletes(List<ClientTupleKeyWithoutCondition> tuples) {
+        if (tuples == null) {
+            return List.of();
+        }
+
+        return tuples.stream()
+                .map(tuple -> formatTuple(tuple.getUser(), tuple.getRelation(), tuple.getObject()))
+                .toList();
+    }
+
+    private static String formatTuple(String user, String relation, String object) {
+        return "user=%s, relation=%s, object=%s".formatted(user, relation, object);
+    }
+
     /**
      * Represents the initial set of write and delete tuple operations required for initializing an OpenFGA store.
      * <p>
@@ -217,7 +251,10 @@ public class OpenFgaInitializer implements ApplicationRunner {
                         .toList());
             }
 
-            logger.trace("Initial load request: {}", request);
+            logger.trace(
+                    "Initial load request: writes={}, deletes={}",
+                    formatWrites(request.getWrites()),
+                    formatDeletes(request.getDeletes()));
             return request;
         }
     }
