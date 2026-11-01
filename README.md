@@ -60,14 +60,19 @@ implementation("dev.openfga:openfga-spring-boot-starter:0.4.1") // x-release-ple
 
 ### Requirements
 
-- Java >= 17 and Spring Boot
+- Java >= 17; the unreleased Spring Boot 4 baseline requires Spring Boot >= 4.1
 
-## Spring Boot compatibility
+### Spring Boot compatibility
 
 | OpenFGA starter version | Spring Boot version |
 |-------------------------|---------------------|
 | ≤ `0.4.1`               | Spring Boot `v3`    |
-| unreleased              | Spring Boot `v4`    |
+| unreleased              | Spring Boot `v4.1+` |
+
+The Spring Boot 4 baseline uses the OpenFGA Java SDK's `JsonSerializer` and Jackson 3. A custom
+Jackson `ObjectMapper` bean is not used to configure SDK serialization. If you need custom SDK JSON
+serialization, provide a `JsonSerializer` bean or create your own `ApiClient` with the desired
+serializer.
 
 ### Configuring the starter
 
@@ -148,6 +153,37 @@ openfga:
 The model is written only when the store does not already have one, and the tuples are ensured on
 every startup, so restarts and interrupted initialization are safe. `openfga.store-id` and
 `openfga.initialization.model-location` are required when the mode is `EMBEDDED`.
+
+The tuple file contains `writes` and/or `deletes`. Writes support the `user`, `relation`, `object`,
+and optional `condition` fields; deletes use `user`, `relation`, and `object`:
+
+```json
+{
+  "writes": [
+    {
+      "user": "user:anne",
+      "relation": "viewer",
+      "object": "document:1",
+      "condition": {
+        "name": "is_valid",
+        "context": {
+          "current_time": "2026-11-01T12:00:00Z"
+        }
+      }
+    }
+  ],
+  "deletes": [
+    {
+      "user": "user:anne",
+      "relation": "viewer",
+      "object": "document:2"
+    }
+  ]
+}
+```
+
+The tuple mapping currently supports only these fields; any additional tuple fields are not mapped
+by the starter's initialization format.
 
 #### Full Configuration Example
 
@@ -398,24 +434,25 @@ public Document getDocument(@PathVariable String docId) {
 
 ## Customize ApiClient and HttpClient Configuration
 
-To customize the `ApiClient` configuration, create a `@Bean` method in your Spring Boot application:
+To customize the `HttpClient` used by the auto-configured `ApiClient`, provide an
+`HttpClientBuilderCustomizer` bean:
 
 ```java
 
 @Bean
-public ApiClient apiClient(HttpClient.Builder builder, JsonSerializer jsonSerializer) {
-    return new ApiClient(builder, jsonSerializer);
+public HttpClientBuilderCustomizer httpClientBuilderCustomizer() {
+    return builder -> builder.version(Version.HTTP_2);
 }
 ```
 
-Similarly, to customize the `HttpClient.Builder`:
+If you provide your own `ApiClient` bean instead, create the SDK serializer explicitly unless you
+also provide a `JsonSerializer` bean:
 
 ```java
 
 @Bean
-public HttpClient.Builder httpClientBuilder() {
-    return HttpClient.newBuilder()
-            .version(Version.HTTP_2);
+public ApiClient apiClient() {
+    return new ApiClient(HttpClient.newBuilder(), JsonSerializer.createDefault());
 }
 ```
 
