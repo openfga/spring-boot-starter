@@ -17,9 +17,18 @@ java {
 }
 
 repositories {
-    // uncomment the below line to use the SDK published to your local maven repository
-    // mavenLocal()
     mavenCentral()
+
+    if (providers.gradleProperty('useLocalStarter').getOrElse('false').toBoolean()) {
+        exclusiveContent {
+            forRepository {
+                mavenLocal()
+            }
+            filter {
+                includeModule('dev.openfga', 'openfga-spring-boot-starter')
+            }
+        }
+    }
 }
 
 dependencyManagement {
@@ -28,7 +37,6 @@ dependencyManagement {
     }
 }
 
-// TODO example: update for Spring Boot 4 baseline and JsonSerializer usage
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -38,10 +46,10 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-    testImplementation 'org.testcontainers:testcontainers-openfga:2.0.5'
+    testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
+    testImplementation 'org.testcontainers:testcontainers-openfga'
 }
 
 test {
     useJUnitPlatform()
-    failOnNoDiscoveredTests = false
 }
