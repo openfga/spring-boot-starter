@@ -1,5 +1,8 @@
 package dev.openfga.autoconfigure;
 
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toMap;
+
 import dev.openfga.OpenFga;
 import dev.openfga.OpenFgaExceptionHandler;
 import dev.openfga.sdk.api.client.ApiClient;
@@ -10,8 +13,6 @@ import dev.openfga.sdk.errors.FgaInvalidParameterException;
 import java.net.http.HttpClient;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -108,12 +109,10 @@ public class OpenFgaAutoConfiguration {
             Map<TelemetryMetric, Map<TelemetryAttribute, Object>> telemetryConfiguration) {
         return new TelemetryConfiguration()
                 .metrics(telemetryConfiguration.entrySet().stream()
-                        .collect(Collectors.toMap(
-                                e -> e.getKey().getMetric(), metric -> metric.getValue().entrySet().stream()
-                                        .collect(Collectors.toMap(
-                                                metricConfig ->
-                                                        metricConfig.getKey().getAttribute(),
-                                                metricConfig -> Optional.ofNullable(metricConfig.getValue()))))));
+                        .collect(toMap(e -> e.getKey().getMetric(), metric -> metric.getValue().entrySet().stream()
+                                .collect(toMap(
+                                        metricConfig -> metricConfig.getKey().getAttribute(),
+                                        metricConfig -> ofNullable(metricConfig.getValue()))))));
     }
 
     /**
@@ -207,7 +206,6 @@ public class OpenFgaAutoConfiguration {
      *
      * @param openFgaClient the {@link OpenFgaClient} bean
      * @param openFgaProperties the configuration properties for OpenFGA
-     * @param jsonSerializerProvider provides the {@link JsonSerializer} bean
      * @param resourceLoader the {@link ResourceLoader} used to resolve the configured locations
      * @return the {@link OpenFgaInitializer} bean
      */
@@ -215,12 +213,8 @@ public class OpenFgaAutoConfiguration {
     @ConditionalOnProperty(prefix = "openfga.initialization", name = "mode", havingValue = "embedded")
     @ConditionalOnMissingBean
     public OpenFgaInitializer openFgaInitializer(
-            OpenFgaClient openFgaClient,
-            OpenFgaProperties openFgaProperties,
-            ObjectProvider<JsonSerializer> jsonSerializerProvider,
-            ResourceLoader resourceLoader) {
-        var jsonSerializer =
-                jsonSerializerProvider.getIfAvailable(OpenFgaAutoConfiguration::createDefaultJsonSerializer);
+            OpenFgaClient openFgaClient, OpenFgaProperties openFgaProperties, ResourceLoader resourceLoader) {
+        final var jsonSerializer = createDefaultJsonSerializer();
         return new OpenFgaInitializer(
                 openFgaClient, openFgaProperties.getInitialization(), resourceLoader, jsonSerializer);
     }
