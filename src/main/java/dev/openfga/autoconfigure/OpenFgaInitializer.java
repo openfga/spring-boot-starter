@@ -251,10 +251,10 @@ public class OpenFgaInitializer implements ApplicationRunner {
                         .toList());
             }
 
-            logger.trace(
-                    "Initial load request: writes={}, deletes={}",
-                    formatWrites(request.getWrites()),
-                    formatDeletes(request.getDeletes()));
+            logger.atTrace()
+                    .addArgument(() -> formatWrites(request.getWrites()))
+                    .addArgument(() -> formatDeletes(request.getDeletes()))
+                    .log("Initial load request: writes={}, deletes={}");
             return request;
         }
     }
