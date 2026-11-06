@@ -3,7 +3,20 @@
     {
       "user": "user:123",
       "relation": "reader",
-      "object": "document:1"
+      "object": "document:1",
+      "condition": {
+        "name": "is_valid",
+        "context": {
+          "key": "value"
+        }
+      }
+    }
+  ],
+  "deletes": [
+    {
+      "user": "user:123",
+      "relation": "reader",
+      "object": "document:2"
     }
   ]
 }

@@ -1,8 +1,8 @@
 package dev.openfga.example.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.openfga.example.Document;
 import dev.openfga.example.DocumentService;
+import dev.openfga.sdk.api.client.JsonSerializer;
 import dev.openfga.sdk.api.client.OpenFgaClient;
 import dev.openfga.sdk.api.client.model.ClientReadRequest;
 import dev.openfga.sdk.api.client.model.ClientTupleKey;
@@ -25,11 +25,12 @@ import java.util.List;
 public class LoadData {
 
     private static final Logger logger = LoggerFactory.getLogger(LoadData.class);
+    private static final JsonSerializer JSON_SERIALIZER = JsonSerializer.createDefault();
 
     @Bean
-    CommandLineRunner initDatabase(OpenFgaClient openFgaClient, ObjectMapper objectMapper, DocumentService documentService) {
+    CommandLineRunner initDatabase(OpenFgaClient openFgaClient, DocumentService documentService) {
         return args -> {
-            loadFgaData(openFgaClient, objectMapper);
+            loadFgaData(openFgaClient);
             loadDocuments(documentService);
         };
     }
@@ -39,7 +40,7 @@ public class LoadData {
         logger.info("Preloading " + documentService.saveDocument(new Document("2", "this is document 2 content")));
     }
 
-    private void loadFgaData(OpenFgaClient openFgaClient, ObjectMapper objectMapper) throws Exception {
+    private void loadFgaData(OpenFgaClient openFgaClient) throws Exception {
         // CreateStore
         logger.debug("Creating Test Store");
         var store = openFgaClient
@@ -62,7 +63,8 @@ public class LoadData {
 
         var authModelJson = loadResource();
         var authorizationModel = openFgaClient
-                .writeAuthorizationModel(objectMapper.readValue(authModelJson, WriteAuthorizationModelRequest.class))
+                .writeAuthorizationModel(JSON_SERIALIZER.readValue(
+                        authModelJson.getBytes(StandardCharsets.UTF_8), WriteAuthorizationModelRequest.class))
                 .get();
         logger.debug("Authorization Model ID " + authorizationModel.getAuthorizationModelId());
 
@@ -87,7 +89,7 @@ public class LoadData {
         // Read
         logger.debug("Reading Tuples");
         var readTuples = openFgaClient.read(new ClientReadRequest()).get();
-        logger.debug("Read Tuples" + objectMapper.writeValueAsString(readTuples));
+        logger.debug("Read Tuples Count: {}", readTuples.getTuples().size());
     }
 
     private String loadResource() {

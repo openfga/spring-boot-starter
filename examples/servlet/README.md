@@ -64,23 +64,49 @@ You can also create a document, for which user `anne` will be granted the owner 
 curl -d '{"id": "10", "content": "new document content"}' -H 'Content-Type: application/json' http://localhost:8080/documents
 ```
 
-## Using example with local unpublished starter
+## Using the current starter checkout
 
-To run the example using a non-published version of the OpenFGA Spring Boot Starter, first publish the starter to your local maven repository.
+By default, the example resolves its release-managed starter dependency from Maven Central. The
+published `0.4.1` release targets Spring Boot 3, while this example uses Spring Boot 4.1. Until a
+Spring Boot 4-compatible starter release is published, publish the current starter checkout to a
+local Maven repository and opt in to that artifact.
 
-In the root directory of this repository, run:
+From the starter repository root, publish the starter:
 
 ```shell
-./gradlew assemble publishToMavenLocal
+./gradlew publishToMavenLocal
 ```
 
-Update `examples/servlet/build.gradle` to use your local maven repository:
+Repeat this command after making changes to the starter. The starter build applies publication
+signing, so `publishToMavenLocal` requires the configured signing credentials; without a configured
+signatory the publication task fails.
 
-```groovy
-repositories {
-  mavenLocal()
-  mavenCentral()
-}
+Then, from `examples/servlet`, run the application or its tests with the local starter enabled:
+
+```shell
+./gradlew -PuseLocalStarter=true bootRun
+./gradlew -PuseLocalStarter=true test
 ```
 
-You can then run the application as documented above.
+The property routes only `dev.openfga:openfga-spring-boot-starter` to Maven Local; all other
+dependencies still resolve from Maven Central. If the starter is not present locally, Gradle fails
+instead of falling back to the published release. The example's `@ServiceConnection` test support
+is supplied by the starter JAR, including its `META-INF/spring.factories` registration.
+
+The local development artifact has the same `0.4.1` coordinates as the published Spring Boot 3
+release. Publishing it to your normal Maven Local repository can replace another locally installed
+artifact with those coordinates. To keep the development artifact isolated, choose an absolute
+repository path and pass the same `-Dmaven.repo.local` option to both builds.
+
+From the starter repository root:
+
+```shell
+./gradlew publishToMavenLocal -Dmaven.repo.local=/absolute/path/to/openfga-maven-repository
+```
+
+From `examples/servlet`:
+
+```shell
+./gradlew -PuseLocalStarter=true bootRun -Dmaven.repo.local=/absolute/path/to/openfga-maven-repository
+./gradlew -PuseLocalStarter=true test -Dmaven.repo.local=/absolute/path/to/openfga-maven-repository
+```
