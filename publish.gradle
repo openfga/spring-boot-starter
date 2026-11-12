@@ -46,6 +46,7 @@ signing {
     def signingPassword = System.getenv('ORG_GRADLE_PROJECT_SIGNINGPASSWORD')
     useInMemoryPgpKeys(signingKey, signingPassword)
     sign publishing.publications.maven
+    required = { gradle.taskGraph.allTasks.any { it.name in ['publishToSonatype', 'publishAllPublicationsToGitHubPackagesRepository'] } }
 }
 
 nexusPublishing {
