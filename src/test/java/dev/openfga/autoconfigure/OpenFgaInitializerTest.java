@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -20,7 +19,6 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import dev.openfga.UnitTest;
 import dev.openfga.autoconfigure.OpenFgaInitializer.InitialTupleKey;
-import dev.openfga.sdk.api.client.JsonSerializer;
 import dev.openfga.sdk.api.client.OpenFgaClient;
 import dev.openfga.sdk.api.client.model.ClientReadAuthorizationModelResponse;
 import dev.openfga.sdk.api.client.model.ClientReadRequest;
@@ -59,9 +57,6 @@ class OpenFgaInitializerTest {
     @Mock
     private ResourceLoader resourceLoader;
 
-    @Mock
-    private JsonSerializer jsonSerializer;
-
     private OpenFgaProperties.Initialization initialization(String modelLocation, String tuplesLocation) {
         var initialization = new OpenFgaProperties.Initialization();
         initialization.setMode(OpenFgaProperties.InitializationMode.EMBEDDED);
@@ -71,8 +66,7 @@ class OpenFgaInitializerTest {
     }
 
     private OpenFgaInitializer initializer(String modelLocation, String tuplesLocation) {
-        return new OpenFgaInitializer(
-                fgaClient, initialization(modelLocation, tuplesLocation), resourceLoader, jsonSerializer);
+        return new OpenFgaInitializer(fgaClient, initialization(modelLocation, tuplesLocation), resourceLoader);
     }
 
     private void stubLatestModel(AuthorizationModel model) throws Exception {
@@ -157,8 +151,6 @@ class OpenFgaInitializerTest {
     void writesModelWhenNoneExists() throws Exception {
         stubLatestModel(null);
         stubResource("classpath:fga/model.json", "{}".getBytes());
-        when(jsonSerializer.readValue("{}".getBytes(), WriteAuthorizationModelRequest.class))
-                .thenReturn(new WriteAuthorizationModelRequest());
         stubModelWrite();
 
         initializer("classpath:fga/model.json", null).run(new DefaultApplicationArguments());
@@ -173,8 +165,6 @@ class OpenFgaInitializerTest {
         stubResource("classpath:fga/model.json", "{}".getBytes());
         var tuples = tupleJson();
         stubResource("classpath:fga/tuples.json", tuples);
-        when(jsonSerializer.readValue("{}".getBytes(), WriteAuthorizationModelRequest.class))
-                .thenReturn(new WriteAuthorizationModelRequest());
         stubTupleRead(List.of());
         stubModelWrite();
         when(fgaClient.write(any(), any(ClientWriteOptions.class)))
@@ -214,8 +204,7 @@ class OpenFgaInitializerTest {
         var initializer = new OpenFgaInitializer(
                 fgaClient,
                 initialization("classpath:fga/model.json", "classpath:fga/tuples.json"),
-                new DefaultResourceLoader(),
-                JsonSerializer.createDefault());
+                new DefaultResourceLoader());
         initializer.run(new DefaultApplicationArguments());
 
         var modelRequestCaptor = ArgumentCaptor.forClass(WriteAuthorizationModelRequest.class);
@@ -269,8 +258,6 @@ class OpenFgaInitializerTest {
     @Test
     void usesDefaultSerializerForTuplesWhenCustomSerializerIsConfigured() throws Exception {
         stubLatestModel(null);
-        when(jsonSerializer.readValue(any(byte[].class), eq(WriteAuthorizationModelRequest.class)))
-                .thenReturn(new WriteAuthorizationModelRequest());
         stubModelWrite();
         stubTupleRead(List.of());
         when(fgaClient.write(any(), any(ClientWriteOptions.class)))
@@ -279,12 +266,9 @@ class OpenFgaInitializerTest {
         var initializer = new OpenFgaInitializer(
                 fgaClient,
                 initialization("classpath:fga/model.json", "classpath:fga/tuples.json"),
-                new DefaultResourceLoader(),
-                jsonSerializer);
+                new DefaultResourceLoader());
         initializer.run(new DefaultApplicationArguments());
 
-        verify(jsonSerializer).readValue(any(byte[].class), eq(WriteAuthorizationModelRequest.class));
-        verify(jsonSerializer, never()).readValue(any(byte[].class), eq(InitialTuples.class));
         var tupleRequestCaptor = ArgumentCaptor.forClass(ClientWriteRequest.class);
         verify(fgaClient).write(tupleRequestCaptor.capture(), any(ClientWriteOptions.class));
         assertEquals(
@@ -303,8 +287,6 @@ class OpenFgaInitializerTest {
         stubResource("classpath:fga/model.json", "{}".getBytes());
         var tuples = tupleJson();
         stubResource("classpath:fga/tuples.json", tuples);
-        when(jsonSerializer.readValue("{}".getBytes(), WriteAuthorizationModelRequest.class))
-                .thenReturn(new WriteAuthorizationModelRequest());
         stubTupleRead(List.of());
         stubModelWrite();
         var failedWrite = new CompletableFuture<ClientWriteResponse>();
@@ -368,8 +350,6 @@ class OpenFgaInitializerTest {
     void restoresInterruptFlagWhenModelWriteIsInterrupted() throws Exception {
         stubLatestModel(null);
         stubResource("classpath:fga/model.json", "{}".getBytes());
-        when(jsonSerializer.readValue("{}".getBytes(), WriteAuthorizationModelRequest.class))
-                .thenReturn(new WriteAuthorizationModelRequest());
         when(fgaClient.writeAuthorizationModel(any())).thenReturn(new CompletableFuture<>());
 
         assertInterruptRestored(
@@ -382,8 +362,6 @@ class OpenFgaInitializerTest {
         stubResource("classpath:fga/model.json", "{}".getBytes());
         var tuples = tupleJson();
         stubResource("classpath:fga/tuples.json", tuples);
-        when(jsonSerializer.readValue("{}".getBytes(), WriteAuthorizationModelRequest.class))
-                .thenReturn(new WriteAuthorizationModelRequest());
         stubTupleRead(List.of());
         stubModelWrite();
         when(fgaClient.write(any(), any(ClientWriteOptions.class))).thenReturn(new CompletableFuture<>());

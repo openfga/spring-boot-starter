@@ -168,11 +168,7 @@ public class OpenFgaAutoConfiguration {
 
         return new ApiClient(
                 httpClientBuilder,
-                jsonSerializerProvider.getIfAvailable(OpenFgaAutoConfiguration::createDefaultJsonSerializer));
-    }
-
-    private static JsonSerializer createDefaultJsonSerializer() {
-        return JsonSerializer.createDefault();
+                jsonSerializerProvider.getIfAvailable(JsonSerializerFactory::createDefaultJsonSerializer));
     }
 
     /**
@@ -219,9 +215,7 @@ public class OpenFgaAutoConfiguration {
     @ConditionalOnMissingBean
     public OpenFgaInitializer openFgaInitializer(
             OpenFgaClient openFgaClient, OpenFgaProperties openFgaProperties, ResourceLoader resourceLoader) {
-        final var jsonSerializer = createDefaultJsonSerializer();
-        return new OpenFgaInitializer(
-                openFgaClient, openFgaProperties.getInitialization(), resourceLoader, jsonSerializer);
+        return new OpenFgaInitializer(openFgaClient, openFgaProperties.getInitialization(), resourceLoader);
     }
 
     /**
