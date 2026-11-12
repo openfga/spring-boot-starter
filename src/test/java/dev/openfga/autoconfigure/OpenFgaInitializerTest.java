@@ -1,6 +1,7 @@
 package dev.openfga.autoconfigure;
 
-import static dev.openfga.autoconfigure.OpenFgaInitializer.*;
+import static dev.openfga.autoconfigure.OpenFgaInitializer.InitialTupleKeyWithoutCondition;
+import static dev.openfga.autoconfigure.OpenFgaInitializer.InitialTuples;
 import static java.lang.Thread.currentThread;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
