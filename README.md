@@ -360,9 +360,9 @@ The OpenFGA Spring Boot Starter can be configured using the following properties
 
 #### `openfga.initialization.tuples-location`
 
-- **Description**: Optional Spring resource location of a JSON `ClientWriteRequest` (an object with
+- **Description**: Optional Spring resource location of a JSON file (containing an object with
   `writes` and/or `deletes`) applied at startup. Only the changes that are not already applied are
-  written.
+  written. JSON structure can be taken from the example provided.
 - **Example**: `classpath:fga/tuples.json`
 
 ### Using the `fgaClient` bean
