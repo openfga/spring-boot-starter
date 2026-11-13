@@ -60,7 +60,7 @@ implementation("dev.openfga:openfga-spring-boot-starter:0.4.1") // x-release-ple
 
 ### Requirements
 
-- Java >= 17; 
+- Java >= 17;
 - the Spring Boot 4 baseline depends on the starters version, see compatibility section below
 
 ### Spring Boot compatibility
@@ -68,7 +68,7 @@ implementation("dev.openfga:openfga-spring-boot-starter:0.4.1") // x-release-ple
 | OpenFGA starter version | Spring Boot version |
 |-------------------------|---------------------|
 | ≤ `0.4.1`               | Spring Boot `v3`    |
-| ≥ `0.5.0`              | Spring Boot `v4.1+` |
+| ≥ `0.5.0`               | Spring Boot `v4.1+` |
 
 The Spring Boot 4 baseline uses the OpenFGA Java SDK's `JsonSerializer` and Jackson 3. A custom
 Jackson `ObjectMapper` bean is not used to configure SDK serialization. If you need custom SDK JSON
