@@ -20,8 +20,11 @@ group = 'dev.openfga'
 version = '0.4.1' // x-release-please-version
 
 wrapper {
-    gradleVersion = '9.6.1'
+    gradleVersion = '9.9.0'
+    distributionSha256Sum = '0b00b0ffe07c4d4789c12d4935a44a7057d55774b7540bd4a3f76f336deb177a'
 }
+
+ext['jackson-bom.version'] = '3.1.8'
 
 java {
     toolchain {
@@ -48,16 +51,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot'
     implementation 'org.springframework.boot:spring-boot-autoconfigure'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-    implementation "org.openapitools:jackson-databind-nullable:${jacksonDatabindNullableVersion}"
 
     api "dev.openfga:openfga-sdk:${openfgaSdkVersion}"
 
     // Optional Testcontainers @ServiceConnection support. Only needed when consumers opt in to
     // Testcontainers in their tests; the connection-details factory is skipped if these are absent.
     compileOnly 'org.springframework.boot:spring-boot-testcontainers'
-    compileOnly 'org.testcontainers:openfga'
+    compileOnly 'org.testcontainers:testcontainers-openfga'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
@@ -65,10 +65,9 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.hamcrest:hamcrest'
     testImplementation 'org.mockito:mockito-core'
-    testImplementation 'com.fasterxml.jackson.core:jackson-databind'
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-    testImplementation 'org.testcontainers:junit-jupiter'
-    testImplementation 'org.testcontainers:openfga'
+    testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
+    testImplementation 'org.testcontainers:testcontainers-openfga'
 }
 
 test {

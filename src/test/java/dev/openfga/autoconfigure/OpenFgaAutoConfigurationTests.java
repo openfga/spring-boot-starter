@@ -1,7 +1,7 @@
 package dev.openfga.autoconfigure;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.nullValue;
@@ -13,13 +13,14 @@ import dev.openfga.sdk.api.configuration.ClientConfiguration;
 import dev.openfga.sdk.api.configuration.CredentialsMethod;
 import java.time.Duration;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 class OpenFgaAutoConfigurationTests {
 
-    private ApplicationContextRunner contextRunner = new ApplicationContextRunner();
+    private final ApplicationContextRunner contextRunner = new ApplicationContextRunner();
 
     @Test
     void noBeanConfiguredIfMissingProperties() {
@@ -67,6 +68,19 @@ class OpenFgaAutoConfigurationTests {
                                     hasEntry(
                                             hasProperty("name", is("fga-client.request.client_id")),
                                             is(Optional.of("client request client ID")))));
+                });
+    }
+
+    @Test
+    void appliesCustomHttpClientBuilderCustomizerWithoutOtherCustomBeans() {
+        var customized = new AtomicBoolean();
+        contextRunner
+                .withPropertyValues("openfga.api-url=https://fga-api-url")
+                .withBean(HttpClientBuilderCustomizer.class, () -> builder -> customized.set(true))
+                .withConfiguration(AutoConfigurations.of(OpenFgaAutoConfiguration.class))
+                .run(context -> {
+                    context.getBean(dev.openfga.sdk.api.client.ApiClient.class);
+                    assertThat(customized.get(), is(true));
                 });
     }
 

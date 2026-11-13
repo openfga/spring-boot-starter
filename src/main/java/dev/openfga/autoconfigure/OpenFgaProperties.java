@@ -412,8 +412,8 @@ public class OpenFgaProperties implements InitializingBean {
 
         /**
          * Optional location of the initial tuples to write, as a Spring resource path
-         * (e.g. {@code classpath:fga/tuples.json}). The resource must contain a JSON
-         * {@code ClientWriteRequest}.
+         * (e.g. {@code classpath:fga/tuples.json}). Please see the provided example
+         * {@code tuples.json} for a structural representation.
          */
         private String tuplesLocation;
 

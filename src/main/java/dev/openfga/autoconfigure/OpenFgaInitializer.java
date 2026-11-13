@@ -1,10 +1,12 @@
 package dev.openfga.autoconfigure;
 
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static dev.openfga.autoconfigure.JsonSerializerFactory.createDefaultJsonSerializer;
+
+import dev.openfga.sdk.api.client.JsonSerializer;
 import dev.openfga.sdk.api.client.OpenFgaClient;
 import dev.openfga.sdk.api.client.model.ClientReadRequest;
 import dev.openfga.sdk.api.client.model.ClientReadResponse;
+import dev.openfga.sdk.api.client.model.ClientRelationshipCondition;
 import dev.openfga.sdk.api.client.model.ClientTupleKey;
 import dev.openfga.sdk.api.client.model.ClientTupleKeyWithoutCondition;
 import dev.openfga.sdk.api.client.model.ClientWriteRequest;
@@ -12,8 +14,12 @@ import dev.openfga.sdk.api.configuration.ClientReadOptions;
 import dev.openfga.sdk.api.configuration.ClientWriteOptions;
 import dev.openfga.sdk.api.model.ConsistencyPreference;
 import dev.openfga.sdk.api.model.WriteAuthorizationModelRequest;
+import dev.openfga.sdk.errors.FgaInvalidParameterException;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
@@ -34,11 +40,12 @@ import org.springframework.util.StringUtils;
 public class OpenFgaInitializer implements ApplicationRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(OpenFgaInitializer.class);
+    private static final JsonSerializer TUPLE_JSON_SERIALIZER = JsonSerializer.createDefault();
 
     private final OpenFgaClient fgaClient;
     private final OpenFgaProperties.Initialization initialization;
     private final ResourceLoader resourceLoader;
-    private final ObjectMapper objectMapper;
+    private final JsonSerializer jsonSerializer;
 
     /**
      * Create a new initializer.
@@ -46,24 +53,17 @@ public class OpenFgaInitializer implements ApplicationRunner {
      * @param fgaClient the {@link OpenFgaClient} to write the model and tuples with
      * @param initialization the initialization properties
      * @param resourceLoader the {@link ResourceLoader} used to resolve the configured locations
-     * @param objectMapper the {@link ObjectMapper} used to deserialize the model and tuples
      */
     public OpenFgaInitializer(
-            OpenFgaClient fgaClient,
-            OpenFgaProperties.Initialization initialization,
-            ResourceLoader resourceLoader,
-            ObjectMapper objectMapper) {
+            OpenFgaClient fgaClient, OpenFgaProperties.Initialization initialization, ResourceLoader resourceLoader) {
         this.fgaClient = fgaClient;
         this.initialization = initialization;
         this.resourceLoader = resourceLoader;
-        this.objectMapper = objectMapper
-                .copy()
-                .addMixIn(ClientTupleKey.class, ClientTupleKeyMixin.class)
-                .addMixIn(ClientTupleKeyWithoutCondition.class, ClientTupleKeyWithoutConditionMixin.class);
+        this.jsonSerializer = createDefaultJsonSerializer();
     }
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(@NonNull ApplicationArguments args) throws Exception {
         try {
             String authorizationModelId = findOrWriteAuthorizationModel();
             writeTuples(authorizationModelId);
@@ -73,24 +73,29 @@ public class OpenFgaInitializer implements ApplicationRunner {
         }
     }
 
-    private String findOrWriteAuthorizationModel() throws Exception {
+    private String findOrWriteAuthorizationModel()
+            throws FgaInvalidParameterException, IOException, ExecutionException, InterruptedException {
         var authorizationModel = fgaClient.readLatestAuthorizationModel().get().getAuthorizationModel();
         if (authorizationModel != null) {
             logger.info("OpenFGA store already has an authorization model; skipping model initialization");
             return authorizationModel.getId();
         }
+
         return writeModel();
     }
 
-    private String writeModel() throws Exception {
+    private String writeModel()
+            throws IOException, FgaInvalidParameterException, ExecutionException, InterruptedException {
         Resource resource = resourceLoader.getResource(initialization.getModelLocation());
         if (!resource.exists()) {
             throw new IllegalStateException(
                     "OpenFGA authorization model location does not exist: " + initialization.getModelLocation());
         }
-        var request = objectMapper.readValue(resource.getContentAsByteArray(), WriteAuthorizationModelRequest.class);
+
+        var request = jsonSerializer.readValue(resource.getContentAsByteArray(), WriteAuthorizationModelRequest.class);
         String authorizationModelId =
                 fgaClient.writeAuthorizationModel(request).get().getAuthorizationModelId();
+
         logger.info(
                 "Wrote OpenFGA authorization model {} from {}",
                 authorizationModelId,
@@ -98,21 +103,28 @@ public class OpenFgaInitializer implements ApplicationRunner {
         return authorizationModelId;
     }
 
-    private void writeTuples(String authorizationModelId) throws Exception {
+    private void writeTuples(String authorizationModelId)
+            throws IOException, FgaInvalidParameterException, ExecutionException, InterruptedException {
         if (!StringUtils.hasText(initialization.getTuplesLocation())) {
             return;
         }
+
         Resource resource = resourceLoader.getResource(initialization.getTuplesLocation());
         if (!resource.exists()) {
             throw new IllegalStateException(
                     "OpenFGA initial tuples location does not exist: " + initialization.getTuplesLocation());
         }
-        var requestedTuples = objectMapper.readValue(resource.getContentAsByteArray(), ClientWriteRequest.class);
+
+        var requestedTuples = TUPLE_JSON_SERIALIZER
+                .readValue(resource.getContentAsByteArray(), InitialTuples.class)
+                .toClientWriteRequest();
         var pendingTuples = pendingTuples(requestedTuples);
+
         if (!hasChanges(pendingTuples)) {
             logger.info("Initial OpenFGA tuples already present; skipping tuple initialization");
             return;
         }
+
         try {
             fgaClient
                     .write(pendingTuples, new ClientWriteOptions().authorizationModelId(authorizationModelId))
@@ -122,11 +134,14 @@ public class OpenFgaInitializer implements ApplicationRunner {
                 throw e;
             }
         }
+
         logger.info("Wrote initial OpenFGA tuples from {}", initialization.getTuplesLocation());
     }
 
-    private ClientWriteRequest pendingTuples(ClientWriteRequest requestedTuples) throws Exception {
+    private ClientWriteRequest pendingTuples(ClientWriteRequest requestedTuples)
+            throws FgaInvalidParameterException, ExecutionException, InterruptedException {
         var pendingTuples = new ClientWriteRequest();
+
         if (requestedTuples.getWrites() != null) {
             var pendingWrites = new ArrayList<ClientTupleKey>();
             for (var tuple : requestedTuples.getWrites()) {
@@ -136,6 +151,7 @@ public class OpenFgaInitializer implements ApplicationRunner {
             }
             pendingTuples.writes(pendingWrites);
         }
+
         if (requestedTuples.getDeletes() != null) {
             var pendingDeletes = new ArrayList<ClientTupleKeyWithoutCondition>();
             for (var tuple : requestedTuples.getDeletes()) {
@@ -145,19 +161,23 @@ public class OpenFgaInitializer implements ApplicationRunner {
             }
             pendingTuples.deletes(pendingDeletes);
         }
+
         return pendingTuples;
     }
 
-    private boolean tupleExists(ClientTupleKey tuple) throws Exception {
+    private boolean tupleExists(ClientTupleKey tuple)
+            throws FgaInvalidParameterException, ExecutionException, InterruptedException {
         return readTuple(tuple).getTuples().stream()
                 .anyMatch(existingTuple -> tuple.asTupleKey().equals(existingTuple.getKey()));
     }
 
-    private boolean tupleExists(ClientTupleKeyWithoutCondition tuple) throws Exception {
+    private boolean tupleExists(ClientTupleKeyWithoutCondition tuple)
+            throws FgaInvalidParameterException, ExecutionException, InterruptedException {
         return !readTuple(tuple).getTuples().isEmpty();
     }
 
-    private ClientReadResponse readTuple(ClientTupleKeyWithoutCondition tuple) throws Exception {
+    private ClientReadResponse readTuple(ClientTupleKeyWithoutCondition tuple)
+            throws FgaInvalidParameterException, ExecutionException, InterruptedException {
         var request = new ClientReadRequest()
                 .user(tuple.getUser())
                 .relation(tuple.getRelation())
@@ -171,13 +191,107 @@ public class OpenFgaInitializer implements ApplicationRunner {
                 || (request.getDeletes() != null && !request.getDeletes().isEmpty());
     }
 
-    private abstract static class ClientTupleKeyMixin {
-        @JsonSetter("object")
-        abstract ClientTupleKey _object(String object);
+    private static @NonNull String formatTupleWithCondition(ClientTupleKey tuple) {
+        String formattedTuple = formatTuple(tuple.getUser(), tuple.getRelation(), tuple.getObject());
+
+        var condition = tuple.getCondition();
+        if (condition != null) {
+            formattedTuple += ", condition=%s, context=%s".formatted(condition.getName(), condition.getContext());
+        }
+
+        return formattedTuple;
     }
 
-    private abstract static class ClientTupleKeyWithoutConditionMixin {
-        @JsonSetter("object")
-        abstract ClientTupleKeyWithoutCondition _object(String object);
+    private static String formatTuple(String user, String relation, String object) {
+        return "user=%s, relation=%s, object=%s".formatted(user, relation, object);
+    }
+
+    /**
+     * Represents the initial set of write and delete tuple operations required for initializing an OpenFGA store.
+     * <p>
+     * Holds two lists: one for tuples to be written ({@link InitialTupleKey}) and one for tuples to be deleted
+     * ({@link InitialTupleKeyWithoutCondition}). Provides a method to convert this container into a {@link ClientWriteRequest}
+     * suitable for sending to the OpenFGA client.
+     * <p>
+     * It is an internal helper class needed to replace the functionality that has previously been
+     * provided by the Jackson mixins.
+     */
+    record InitialTuples(List<InitialTupleKey> writes, List<InitialTupleKeyWithoutCondition> deletes) {
+        ClientWriteRequest toClientWriteRequest() {
+            var request = new ClientWriteRequest();
+
+            if (writes != null) {
+                request.writes(
+                        writes.stream().map(InitialTupleKey::toClientTupleKey).toList());
+            }
+
+            if (deletes != null) {
+                request.deletes(deletes.stream()
+                        .map(InitialTupleKeyWithoutCondition::toClientTupleKeyWithoutCondition)
+                        .toList());
+            }
+
+            logger.atTrace()
+                    .addArgument(() -> formatWrites(request.getWrites()))
+                    .addArgument(() -> formatDeletes(request.getDeletes()))
+                    .log("Initial load request: writes={}, deletes={}");
+            return request;
+        }
+
+        private static List<String> formatWrites(List<ClientTupleKey> tuples) {
+            if (tuples == null) {
+                return List.of();
+            }
+
+            return tuples.stream()
+                    .map(OpenFgaInitializer::formatTupleWithCondition)
+                    .toList();
+        }
+
+        private static List<String> formatDeletes(List<ClientTupleKeyWithoutCondition> tuples) {
+            if (tuples == null) {
+                return List.of();
+            }
+
+            return tuples.stream()
+                    .map(tuple -> formatTuple(tuple.getUser(), tuple.getRelation(), tuple.getObject()))
+                    .toList();
+        }
+    }
+
+    /**
+     * Represents a tuple key used for initial authorization data, encapsulating the user, relation, object, and optional condition.
+     * This record provides a mechanism to convert itself into a {@link ClientTupleKey} for interaction with the OpenFGA client.
+     * <p>
+     * This internal class is necessary to overcome the flaw of mapping <code>object</code> json properties into Java properties of name <code>_object</code>.
+     */
+    record InitialTupleKey(String user, String relation, String object, ClientRelationshipCondition condition) {
+        ClientTupleKey toClientTupleKey() {
+            var key = new ClientTupleKey().user(user).relation(relation)._object(object);
+
+            if (condition != null) {
+                key.condition(condition);
+            }
+
+            return key;
+        }
+    }
+
+    /**
+     * Represents an initial tuple key without a condition, used during authorization model initialization.
+     * <p>
+     * This record serves as an intermediate data structure to hold the essential parts of a tuple:
+     * user, relation, and object. It provides conversion capability to a {@link ClientTupleKeyWithoutCondition}
+     * for submission to the OpenFGA client during tuple writes.
+     * <p>
+     * This internal class is necessary to overcome the flaw of mapping <code>object</code> json properties into Java properties of name <code>_object</code>.
+     */
+    record InitialTupleKeyWithoutCondition(String user, String relation, String object) {
+        ClientTupleKeyWithoutCondition toClientTupleKeyWithoutCondition() {
+            return new ClientTupleKeyWithoutCondition()
+                    .user(user)
+                    .relation(relation)
+                    ._object(object);
+        }
     }
 }

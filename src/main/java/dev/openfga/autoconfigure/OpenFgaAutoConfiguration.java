@@ -1,22 +1,23 @@
 package dev.openfga.autoconfigure;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toMap;
+
 import dev.openfga.OpenFga;
 import dev.openfga.OpenFgaExceptionHandler;
 import dev.openfga.sdk.api.client.ApiClient;
+import dev.openfga.sdk.api.client.JsonSerializer;
 import dev.openfga.sdk.api.client.OpenFgaClient;
-import dev.openfga.sdk.api.configuration.*;
+import dev.openfga.sdk.api.configuration.ApiToken;
+import dev.openfga.sdk.api.configuration.ClientConfiguration;
+import dev.openfga.sdk.api.configuration.ClientCredentials;
+import dev.openfga.sdk.api.configuration.Credentials;
+import dev.openfga.sdk.api.configuration.CredentialsMethod;
+import dev.openfga.sdk.api.configuration.TelemetryConfiguration;
 import dev.openfga.sdk.errors.FgaInvalidParameterException;
 import java.net.http.HttpClient;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import org.openapitools.jackson.nullable.JsonNullableModule;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -113,12 +114,10 @@ public class OpenFgaAutoConfiguration {
             Map<TelemetryMetric, Map<TelemetryAttribute, Object>> telemetryConfiguration) {
         return new TelemetryConfiguration()
                 .metrics(telemetryConfiguration.entrySet().stream()
-                        .collect(Collectors.toMap(
-                                e -> e.getKey().getMetric(), metric -> metric.getValue().entrySet().stream()
-                                        .collect(Collectors.toMap(
-                                                metricConfig ->
-                                                        metricConfig.getKey().getAttribute(),
-                                                metricConfig -> Optional.ofNullable(metricConfig.getValue()))))));
+                        .collect(toMap(e -> e.getKey().getMetric(), metric -> metric.getValue().entrySet().stream()
+                                .collect(toMap(
+                                        metricConfig -> metricConfig.getKey().getAttribute(),
+                                        metricConfig -> ofNullable(metricConfig.getValue()))))));
     }
 
     /**
@@ -154,7 +153,7 @@ public class OpenFgaAutoConfiguration {
      * Creates an {@link ApiClient} bean if none exists.
      *
      * @param httpClientBuilderProvider provides the {@link HttpClient.Builder} bean
-     * @param objectMapperProvider provides the {@link ObjectMapper} bean
+     * @param jsonSerializerProvider provides the {@link JsonSerializer} bean
      * @param httpClientBuilderCustomizer customizes the {@link HttpClient.Builder}
      * @return the configured {@link ApiClient} bean
      */
@@ -162,31 +161,14 @@ public class OpenFgaAutoConfiguration {
     @ConditionalOnMissingBean
     public ApiClient apiClient(
             ObjectProvider<HttpClient.Builder> httpClientBuilderProvider,
-            ObjectProvider<ObjectMapper> objectMapperProvider,
+            ObjectProvider<JsonSerializer> jsonSerializerProvider,
             HttpClientBuilderCustomizer httpClientBuilderCustomizer) {
-
-        if ((httpClientBuilderProvider.getIfAvailable() == null) && (objectMapperProvider.getIfAvailable() == null)) {
-            return new ApiClient();
-        }
         var httpClientBuilder = httpClientBuilderProvider.getIfAvailable(HttpClient::newBuilder);
         httpClientBuilderCustomizer.customize(httpClientBuilder);
+
         return new ApiClient(
                 httpClientBuilder,
-                objectMapperProvider.getIfAvailable(OpenFgaAutoConfiguration::createDefaultObjectMapper));
-    }
-
-    private static ObjectMapper createDefaultObjectMapper() {
-        var mapper = new ObjectMapper();
-        mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        mapper.configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        mapper.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
-        mapper.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
-        mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
-        mapper.registerModule(new JavaTimeModule());
-        mapper.registerModule(new JsonNullableModule());
-        return mapper;
+                jsonSerializerProvider.getIfAvailable(JsonSerializerFactory::createDefaultJsonSerializer));
     }
 
     /**
@@ -225,7 +207,6 @@ public class OpenFgaAutoConfiguration {
      *
      * @param openFgaClient the {@link OpenFgaClient} bean
      * @param openFgaProperties the configuration properties for OpenFGA
-     * @param objectMapperProvider provides the {@link ObjectMapper} bean
      * @param resourceLoader the {@link ResourceLoader} used to resolve the configured locations
      * @return the {@link OpenFgaInitializer} bean
      */
@@ -233,13 +214,8 @@ public class OpenFgaAutoConfiguration {
     @ConditionalOnProperty(prefix = "openfga.initialization", name = "mode", havingValue = "embedded")
     @ConditionalOnMissingBean
     public OpenFgaInitializer openFgaInitializer(
-            OpenFgaClient openFgaClient,
-            OpenFgaProperties openFgaProperties,
-            ObjectProvider<ObjectMapper> objectMapperProvider,
-            ResourceLoader resourceLoader) {
-        var objectMapper = objectMapperProvider.getIfAvailable(OpenFgaAutoConfiguration::createDefaultObjectMapper);
-        return new OpenFgaInitializer(
-                openFgaClient, openFgaProperties.getInitialization(), resourceLoader, objectMapper);
+            OpenFgaClient openFgaClient, OpenFgaProperties openFgaProperties, ResourceLoader resourceLoader) {
+        return new OpenFgaInitializer(openFgaClient, openFgaProperties.getInitialization(), resourceLoader);
     }
 
     /**
