@@ -1,7 +1,6 @@
 package dev.openfga.autoconfigure;
 
-import static dev.openfga.autoconfigure.JsonSerializerFactory.createDefaultJsonSerializer;
-
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import dev.openfga.sdk.api.client.JsonSerializer;
 import dev.openfga.sdk.api.client.OpenFgaClient;
 import dev.openfga.sdk.api.client.model.ClientReadRequest;
@@ -18,6 +17,7 @@ import dev.openfga.sdk.errors.FgaInvalidParameterException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -40,12 +40,11 @@ import org.springframework.util.StringUtils;
 public class OpenFgaInitializer implements ApplicationRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(OpenFgaInitializer.class);
-    private static final JsonSerializer TUPLE_JSON_SERIALIZER = JsonSerializer.createDefault();
+    private static final JsonSerializer JSON_SERIALIZER = JsonSerializer.createDefault();
 
     private final OpenFgaClient fgaClient;
     private final OpenFgaProperties.Initialization initialization;
     private final ResourceLoader resourceLoader;
-    private final JsonSerializer jsonSerializer;
 
     /**
      * Create a new initializer.
@@ -59,7 +58,6 @@ public class OpenFgaInitializer implements ApplicationRunner {
         this.fgaClient = fgaClient;
         this.initialization = initialization;
         this.resourceLoader = resourceLoader;
-        this.jsonSerializer = createDefaultJsonSerializer();
     }
 
     @Override
@@ -92,7 +90,7 @@ public class OpenFgaInitializer implements ApplicationRunner {
                     "OpenFGA authorization model location does not exist: " + initialization.getModelLocation());
         }
 
-        var request = jsonSerializer.readValue(resource.getContentAsByteArray(), WriteAuthorizationModelRequest.class);
+        var request = JSON_SERIALIZER.readValue(resource.getContentAsByteArray(), WriteAuthorizationModelRequest.class);
         String authorizationModelId =
                 fgaClient.writeAuthorizationModel(request).get().getAuthorizationModelId();
 
@@ -115,7 +113,7 @@ public class OpenFgaInitializer implements ApplicationRunner {
                     "OpenFGA initial tuples location does not exist: " + initialization.getTuplesLocation());
         }
 
-        var requestedTuples = TUPLE_JSON_SERIALIZER
+        var requestedTuples = JSON_SERIALIZER
                 .readValue(resource.getContentAsByteArray(), InitialTuples.class)
                 .toClientWriteRequest();
         var pendingTuples = pendingTuples(requestedTuples);
@@ -214,9 +212,15 @@ public class OpenFgaInitializer implements ApplicationRunner {
      * suitable for sending to the OpenFGA client.
      * <p>
      * It is an internal helper class needed to replace the functionality that has previously been
-     * provided by the Jackson mixins.
+     * provided by the Jackson mixins. Unknown properties are rejected so that a misspelled key fails
+     * startup instead of being ignored.
      */
     record InitialTuples(List<InitialTupleKey> writes, List<InitialTupleKeyWithoutCondition> deletes) {
+        @JsonAnySetter
+        void rejectUnknownProperty(String name, Object value) {
+            throw new IllegalArgumentException("Unknown property in OpenFGA initial tuples: " + name);
+        }
+
         ClientWriteRequest toClientWriteRequest() {
             var request = new ClientWriteRequest();
 
@@ -265,12 +269,18 @@ public class OpenFgaInitializer implements ApplicationRunner {
      * <p>
      * This internal class is necessary to overcome the flaw of mapping <code>object</code> json properties into Java properties of name <code>_object</code>.
      */
-    record InitialTupleKey(String user, String relation, String object, ClientRelationshipCondition condition) {
+    record InitialTupleKey(String user, String relation, String object, InitialCondition condition) {
+        @JsonAnySetter
+        void rejectUnknownProperty(String name, Object value) {
+            throw new IllegalArgumentException("Unknown property in OpenFGA initial tuple write: " + name);
+        }
+
         ClientTupleKey toClientTupleKey() {
             var key = new ClientTupleKey().user(user).relation(relation)._object(object);
 
             if (condition != null) {
-                key.condition(condition);
+                key.condition(
+                        new ClientRelationshipCondition().name(condition.name()).context(condition.context()));
             }
 
             return key;
@@ -287,11 +297,26 @@ public class OpenFgaInitializer implements ApplicationRunner {
      * This internal class is necessary to overcome the flaw of mapping <code>object</code> json properties into Java properties of name <code>_object</code>.
      */
     record InitialTupleKeyWithoutCondition(String user, String relation, String object) {
+        @JsonAnySetter
+        void rejectUnknownProperty(String name, Object value) {
+            throw new IllegalArgumentException("Unknown property in OpenFGA initial tuple delete: " + name);
+        }
+
         ClientTupleKeyWithoutCondition toClientTupleKeyWithoutCondition() {
             return new ClientTupleKeyWithoutCondition()
                     .user(user)
                     .relation(relation)
                     ._object(object);
+        }
+    }
+
+    /**
+     * Represents the condition of an initial tuple write. The context is passed to OpenFGA as is.
+     */
+    record InitialCondition(String name, Map<String, Object> context) {
+        @JsonAnySetter
+        void rejectUnknownProperty(String name, Object value) {
+            throw new IllegalArgumentException("Unknown property in OpenFGA initial tuple condition: " + name);
         }
     }
 }
