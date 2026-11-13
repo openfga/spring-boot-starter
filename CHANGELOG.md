@@ -3,33 +3,34 @@
 ## [0.5.0](https://github.com/openfga/spring-boot-starter/compare/v0.4.1...v0.5.0) (2026-11-13)
 
 
+> [!NOTE]
+> This release moves the starter to the Spring Boot 4.1 baseline and completes the work tracked in [#184](https://github.com/openfga/spring-boot-starter/issues/184). Applications on Spring Boot 3 should stay on the `0.4.x` line.
+
 ### ⚠ BREAKING CHANGES
 
-* **spring-boot:** upgrade to v4.1 baseline ([#201](https://github.com/openfga/spring-boot-starter/issues/201))
+* **spring-boot:** Spring Boot `4.1+` and Java 17 are required ([#201](https://github.com/openfga/spring-boot-starter/issues/201)) ([58b42d9](https://github.com/openfga/spring-boot-starter/commit/58b42d9aa61282f2a3ee22f13bd267221f7b52b8))
+* **sdk:** a custom Jackson `ObjectMapper` bean is no longer used to configure SDK serialization. Provide a `dev.openfga.sdk.api.client.JsonSerializer` bean, or define your own `ApiClient`, to customize JSON handling.
+* **initializer:** the `OpenFgaInitializer` constructor no longer takes an `ObjectMapper`.
+* **testcontainers:** the optional `@ServiceConnection` support now requires the Testcontainers 2 artifact `org.testcontainers:testcontainers-openfga` instead of `org.testcontainers:openfga`.
 
 ### Added
 
-* **example:** add integration tests ([1c5cc5e](https://github.com/openfga/spring-boot-starter/commit/1c5cc5e7167eed07efee36ba993370678a37fcbd)), closes [#184](https://github.com/openfga/spring-boot-starter/issues/184)
-* **example:** always use default json serializer for initializer ([ce76511](https://github.com/openfga/spring-boot-starter/commit/ce7651109448ae733e749ddc1745ea11c840b1de)), closes [#184](https://github.com/openfga/spring-boot-starter/issues/184)
-* **example:** do not use ObjectMapper anymore ([8a17b33](https://github.com/openfga/spring-boot-starter/commit/8a17b339b9cd63e89608236c732f65096c84b01a)), closes [#184](https://github.com/openfga/spring-boot-starter/issues/184)
-* **example:** make it possible to use locally build unreleased starter version ([42e2366](https://github.com/openfga/spring-boot-starter/commit/42e2366fde5f0c30983fbcbc42f37862cd4ccde9)), closes [#184](https://github.com/openfga/spring-boot-starter/issues/184)
-* **readme:** add spring boot compat matrix and fix some typos ([8f68760](https://github.com/openfga/spring-boot-starter/commit/8f6876063ec1843c4e009778ebb0e85aa1305156))
-* **sdk:** refactor towards JsonSerializer usage ([b0ecc90](https://github.com/openfga/spring-boot-starter/commit/b0ecc90c4762baf4751393c728b188ba3c5ffb82))
-* **spring-boot:** upgrade to v4.1 baseline ([#201](https://github.com/openfga/spring-boot-starter/issues/201)) ([58b42d9](https://github.com/openfga/spring-boot-starter/commit/58b42d9aa61282f2a3ee22f13bd267221f7b52b8))
+* **initializer:** tuple files support `condition` on writes and a `deletes` list ([da8f7e9](https://github.com/openfga/spring-boot-starter/commit/da8f7e9d64fd4af9311d16ff88802e2c267bb0e2))
+* **sdk:** use the SDK `JsonSerializer` abstraction instead of a Jackson `ObjectMapper` ([b0ecc90](https://github.com/openfga/spring-boot-starter/commit/b0ecc90c4762baf4751393c728b188ba3c5ffb82))
+* **readme:** add a Spring Boot compatibility matrix ([8f68760](https://github.com/openfga/spring-boot-starter/commit/8f6876063ec1843c4e009778ebb0e85aa1305156))
+* **example:** add integration tests and upgrade the servlet example to Spring Boot 4.1 ([1c5cc5e](https://github.com/openfga/spring-boot-starter/commit/1c5cc5e7167eed07efee36ba993370678a37fcbd))
 
 
 ### Fixed
 
-* **auto-configure:** have better ApiClient bean construction ([e3b6013](https://github.com/openfga/spring-boot-starter/commit/e3b6013272858cb1e343f09c338c96a01aca0818)), closes [#184](https://github.com/openfga/spring-boot-starter/issues/184)
-* **gradle:** check in the wrapper ([d029d31](https://github.com/openfga/spring-boot-starter/commit/d029d31800ca8597f821c2718eedabfb272dbdc4)), closes [#184](https://github.com/openfga/spring-boot-starter/issues/184)
-* **gradle:** use official checksum ([7545e6b](https://github.com/openfga/spring-boot-starter/commit/7545e6b2000b6e9a2ebb3d95f1439a0266035452)), closes [#184](https://github.com/openfga/spring-boot-starter/issues/184)
-* **gradle:** use valid wrapper distribution SHA ([baec943](https://github.com/openfga/spring-boot-starter/commit/baec943fb182614cbedca1520d2f0d6d656135a2)), closes [#184](https://github.com/openfga/spring-boot-starter/issues/184)
+* **auto-configure:** apply a custom `HttpClientBuilderCustomizer` even when no `HttpClient.Builder` or `JsonSerializer` bean is defined ([e3b6013](https://github.com/openfga/spring-boot-starter/commit/e3b6013272858cb1e343f09c338c96a01aca0818))
 
 
 ### Changed
 
-* **initializer:** use default internal JsonSerializer for tuple loading ([da8f7e9](https://github.com/openfga/spring-boot-starter/commit/da8f7e9d64fd4af9311d16ff88802e2c267bb0e2)), closes [#184](https://github.com/openfga/spring-boot-starter/issues/184)
-* **logging:** make sure trace logging params are not pre-evaluated ([16465da](https://github.com/openfga/spring-boot-starter/commit/16465dac63b636bcdf709cd4245d22ca7f67f290)), closes [#184](https://github.com/openfga/spring-boot-starter/issues/184)
+* **sdk:** bump `openfga-sdk` to 0.11.1 ([969b794](https://github.com/openfga/spring-boot-starter/commit/969b794f845d4bb6aa77552ec4df5d6e0c058241))
+* **initializer:** always parse model and tuple files with the SDK default serializer, independent of any custom `JsonSerializer` bean ([be59e56](https://github.com/openfga/spring-boot-starter/commit/be59e56c5bce04e756f89c3d11a94ff55371b5b5))
+* **logging:** avoid evaluating trace log arguments when trace is disabled ([16465da](https://github.com/openfga/spring-boot-starter/commit/16465dac63b636bcdf709cd4245d22ca7f67f290))
 
 ## [0.4.1](https://github.com/openfga/spring-boot-starter/compare/v0.3.3...v0.4.1) (2026-08-12)
 
