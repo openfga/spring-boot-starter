@@ -10,6 +10,8 @@ wrapper {
     distributionSha256Sum = '0b00b0ffe07c4d4789c12d4935a44a7057d55774b7540bd4a3f76f336deb177a'
 }
 
+ext['jackson-bom.version'] = '3.1.8'
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
