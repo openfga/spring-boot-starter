@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.5.0](https://github.com/openfga/spring-boot-starter/compare/v0.4.1...v0.5.0) (2026-11-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* **spring-boot:** upgrade to v4.1 baseline ([#201](https://github.com/openfga/spring-boot-starter/issues/201))
+
+### Added
+
+* **example:** add integration tests ([1c5cc5e](https://github.com/openfga/spring-boot-starter/commit/1c5cc5e7167eed07efee36ba993370678a37fcbd)), closes [#184](https://github.com/openfga/spring-boot-starter/issues/184)
+* **example:** always use default json serializer for initializer ([ce76511](https://github.com/openfga/spring-boot-starter/commit/ce7651109448ae733e749ddc1745ea11c840b1de)), closes [#184](https://github.com/openfga/spring-boot-starter/issues/184)
+* **example:** do not use ObjectMapper anymore ([8a17b33](https://github.com/openfga/spring-boot-starter/commit/8a17b339b9cd63e89608236c732f65096c84b01a)), closes [#184](https://github.com/openfga/spring-boot-starter/issues/184)
+* **example:** make it possible to use locally build unreleased starter version ([42e2366](https://github.com/openfga/spring-boot-starter/commit/42e2366fde5f0c30983fbcbc42f37862cd4ccde9)), closes [#184](https://github.com/openfga/spring-boot-starter/issues/184)
+* **readme:** add spring boot compat matrix and fix some typos ([8f68760](https://github.com/openfga/spring-boot-starter/commit/8f6876063ec1843c4e009778ebb0e85aa1305156))
+* **sdk:** refactor towards JsonSerializer usage ([b0ecc90](https://github.com/openfga/spring-boot-starter/commit/b0ecc90c4762baf4751393c728b188ba3c5ffb82))
+* **spring-boot:** upgrade to v4.1 baseline ([#201](https://github.com/openfga/spring-boot-starter/issues/201)) ([58b42d9](https://github.com/openfga/spring-boot-starter/commit/58b42d9aa61282f2a3ee22f13bd267221f7b52b8))
+
+
+### Fixed
+
+* **auto-configure:** have better ApiClient bean construction ([e3b6013](https://github.com/openfga/spring-boot-starter/commit/e3b6013272858cb1e343f09c338c96a01aca0818)), closes [#184](https://github.com/openfga/spring-boot-starter/issues/184)
+* **gradle:** check in the wrapper ([d029d31](https://github.com/openfga/spring-boot-starter/commit/d029d31800ca8597f821c2718eedabfb272dbdc4)), closes [#184](https://github.com/openfga/spring-boot-starter/issues/184)
+* **gradle:** use official checksum ([7545e6b](https://github.com/openfga/spring-boot-starter/commit/7545e6b2000b6e9a2ebb3d95f1439a0266035452)), closes [#184](https://github.com/openfga/spring-boot-starter/issues/184)
+* **gradle:** use valid wrapper distribution SHA ([baec943](https://github.com/openfga/spring-boot-starter/commit/baec943fb182614cbedca1520d2f0d6d656135a2)), closes [#184](https://github.com/openfga/spring-boot-starter/issues/184)
+
+
+### Changed
+
+* **initializer:** use default internal JsonSerializer for tuple loading ([da8f7e9](https://github.com/openfga/spring-boot-starter/commit/da8f7e9d64fd4af9311d16ff88802e2c267bb0e2)), closes [#184](https://github.com/openfga/spring-boot-starter/issues/184)
+* **logging:** make sure trace logging params are not pre-evaluated ([16465da](https://github.com/openfga/spring-boot-starter/commit/16465dac63b636bcdf709cd4245d22ca7f67f290)), closes [#184](https://github.com/openfga/spring-boot-starter/issues/184)
+
 ## [0.4.1](https://github.com/openfga/spring-boot-starter/compare/v0.3.3...v0.4.1) (2026-08-12)
 
 
