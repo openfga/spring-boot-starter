@@ -19,9 +19,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -80,36 +77,20 @@ class OpenFgaInitializerContainerTest {
         assertThat(canRead("document:2", DURING_GRANT)).isFalse();
     }
 
-    @ParameterizedTest
-    @MethodSource("tupleFilesWithUnknownProperties")
-    void rejectsUnknownPropertiesWithoutChangingTuples(String tuples, String message) throws Exception {
-        var file = Files.writeString(directory.resolve("tuples.json"), tuples);
+    @Test
+    void rejectsUnknownPropertyWithoutChangingTuples() throws Exception {
+        var file = Files.writeString(directory.resolve("tuples.json"), """
+                {"writes": [{"user": "user:123", "relation": "reader", "object": "document:1"}],
+                 "deletes": [{"user": "user:123", "relation": "reader", "object": "document:2",
+                              "condition": {"name": "non_expired_grant"}}]}
+                """);
 
         assertThatThrownBy(() -> initialize(file.toUri().toString()))
                 .hasRootCauseInstanceOf(IllegalArgumentException.class)
-                .hasRootCauseMessage(message);
+                .hasRootCauseMessage("Unknown property in OpenFGA initial tuple delete: condition");
 
         assertThat(canRead("document:1", DURING_GRANT)).isFalse();
         assertThat(canRead("document:2", DURING_GRANT)).isTrue();
-    }
-
-    static Stream<Arguments> tupleFilesWithUnknownProperties() {
-        return Stream.of(
-                Arguments.of("""
-                        {"write": [{"user": "user:123", "relation": "reader", "object": "document:1"}]}
-                        """, "Unknown property in OpenFGA initial tuples: write"),
-                Arguments.of("""
-                        {"writes": [{"user": "user:123", "relation": "reader", "object": "document:1",
-                                     "conditon": {"name": "non_expired_grant"}}]}
-                        """, "Unknown property in OpenFGA initial tuple write: conditon"),
-                Arguments.of("""
-                        {"writes": [{"user": "user:123", "relation": "reader", "object": "document:1",
-                                     "condition": {"name": "non_expired_grant", "contxt": {}}}]}
-                        """, "Unknown property in OpenFGA initial tuple condition: contxt"),
-                Arguments.of("""
-                        {"deletes": [{"user": "user:123", "relation": "reader", "object": "document:2",
-                                      "condition": {"name": "non_expired_grant"}}]}
-                        """, "Unknown property in OpenFGA initial tuple delete: condition"));
     }
 
     private boolean canRead(String document, String currentTime) throws Exception {

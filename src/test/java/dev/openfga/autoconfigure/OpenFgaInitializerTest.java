@@ -4,6 +4,7 @@ import static dev.openfga.autoconfigure.OpenFgaInitializer.InitialTupleKeyWithou
 import static dev.openfga.autoconfigure.OpenFgaInitializer.InitialTuples;
 import static java.lang.Thread.currentThread;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,6 +26,7 @@ import dev.openfga.sdk.api.client.model.ClientReadAuthorizationModelResponse;
 import dev.openfga.sdk.api.client.model.ClientReadRequest;
 import dev.openfga.sdk.api.client.model.ClientReadResponse;
 import dev.openfga.sdk.api.client.model.ClientWriteAuthorizationModelResponse;
+import dev.openfga.sdk.api.client.model.ClientWriteRequest;
 import dev.openfga.sdk.api.client.model.ClientWriteResponse;
 import dev.openfga.sdk.api.configuration.ClientReadOptions;
 import dev.openfga.sdk.api.configuration.ClientWriteOptions;
@@ -35,12 +37,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.DefaultApplicationArguments;
+import org.springframework.core.NestedExceptionUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
@@ -179,6 +186,63 @@ class OpenFgaInitializerTest {
         assertEquals(
                 ConsistencyPreference.HIGHER_CONSISTENCY,
                 readOptionsCaptor.getValue().getConsistency());
+    }
+
+    @Test
+    void writesTupleWithCondition() throws Exception {
+        stubLatestModel(new AuthorizationModel().id("01H..."));
+        stubResource("classpath:fga/tuples.json", """
+                {"writes": [{"user": "user:123", "relation": "reader", "object": "document:1",
+                             "condition": {"name": "non_expired_grant",
+                                           "context": {"grant_duration": "1h", "limits": {"max": 2}}}}]}
+                """.getBytes());
+        stubTupleRead(List.of());
+        when(fgaClient.write(any(), any(ClientWriteOptions.class)))
+                .thenReturn(CompletableFuture.completedFuture(mock(ClientWriteResponse.class)));
+
+        initializer("classpath:fga/model.json", "classpath:fga/tuples.json").run(new DefaultApplicationArguments());
+
+        var requestCaptor = ArgumentCaptor.forClass(ClientWriteRequest.class);
+        verify(fgaClient).write(requestCaptor.capture(), any(ClientWriteOptions.class));
+        var condition = requestCaptor.getValue().getWrites().get(0).getCondition();
+        assertEquals("non_expired_grant", condition.getName());
+        assertEquals(Map.of("grant_duration", "1h", "limits", Map.of("max", 2)), condition.getContext());
+    }
+
+    @ParameterizedTest
+    @MethodSource("tupleFilesWithUnknownProperties")
+    void rejectsUnknownPropertiesBeforeReadingOrWritingTuples(String tuples, String message) throws Exception {
+        stubLatestModel(new AuthorizationModel().id("01H..."));
+        stubResource("classpath:fga/tuples.json", tuples.getBytes());
+
+        var exception =
+                assertThrows(Exception.class, () -> initializer("classpath:fga/model.json", "classpath:fga/tuples.json")
+                        .run(new DefaultApplicationArguments()));
+
+        var cause = NestedExceptionUtils.getMostSpecificCause(exception);
+        assertInstanceOf(IllegalArgumentException.class, cause);
+        assertEquals(message, cause.getMessage());
+        verify(fgaClient, never()).read(any(), any());
+        verify(fgaClient, never()).write(any(), any());
+    }
+
+    static Stream<Arguments> tupleFilesWithUnknownProperties() {
+        return Stream.of(
+                Arguments.of("""
+                        {"write": [{"user": "user:123", "relation": "reader", "object": "document:1"}]}
+                        """, "Unknown property in OpenFGA initial tuples: write"),
+                Arguments.of("""
+                        {"writes": [{"user": "user:123", "relation": "reader", "object": "document:1",
+                                     "conditon": {"name": "non_expired_grant"}}]}
+                        """, "Unknown property in OpenFGA initial tuple write: conditon"),
+                Arguments.of("""
+                        {"writes": [{"user": "user:123", "relation": "reader", "object": "document:1",
+                                     "condition": {"name": "non_expired_grant", "contxt": {}}}]}
+                        """, "Unknown property in OpenFGA initial tuple condition: contxt"),
+                Arguments.of("""
+                        {"deletes": [{"user": "user:123", "relation": "reader", "object": "document:2",
+                                      "condition": {"name": "non_expired_grant"}}]}
+                        """, "Unknown property in OpenFGA initial tuple delete: condition"));
     }
 
     @Test
