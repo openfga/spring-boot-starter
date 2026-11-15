@@ -183,8 +183,9 @@ and optional `condition` fields; deletes use `user`, `relation`, and `object`:
 }
 ```
 
-The tuple mapping currently supports only these fields; any additional tuple fields are not mapped
-by the starter's initialization format.
+An unknown key stops startup before the starter writes or deletes a tuple. This applies at the top
+level, in a write, in a delete, and in a `condition`. Deletes do not accept a `condition`. The
+content of `condition.context` is free-form and goes to OpenFGA unchanged.
 
 #### Full Configuration Example
 
