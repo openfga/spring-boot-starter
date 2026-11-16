@@ -87,7 +87,8 @@ class OpenFgaInitializerContainerTest {
 
         assertThatThrownBy(() -> initialize(file.toUri().toString()))
                 .hasRootCauseInstanceOf(IllegalArgumentException.class)
-                .hasRootCauseMessage("Unknown property in OpenFGA initial tuple delete: condition");
+                .hasRootCauseMessage("Unknown property 'condition' in OpenFGA initial tuple delete"
+                        + " user=user:123, relation=reader, object=document:2");
 
         assertThat(canRead("document:1", DURING_GRANT)).isFalse();
         assertThat(canRead("document:2", DURING_GRANT)).isTrue();

@@ -33,6 +33,7 @@ import dev.openfga.sdk.api.configuration.ClientWriteOptions;
 import dev.openfga.sdk.api.model.AuthorizationModel;
 import dev.openfga.sdk.api.model.ConsistencyPreference;
 import dev.openfga.sdk.api.model.Tuple;
+import dev.openfga.sdk.api.model.WriteAuthorizationModelRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -48,6 +49,7 @@ import org.mockito.Mock;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.core.NestedExceptionUtils;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
@@ -189,6 +191,46 @@ class OpenFgaInitializerTest {
     }
 
     @Test
+    void loadsClasspathFixtures() throws Exception {
+        stubLatestModel(null);
+        stubModelWrite();
+        var existingTuple = new Tuple()
+                .key(new InitialTupleKey("user:123", "reader", "document:2", null)
+                        .toClientTupleKey()
+                        .asTupleKey());
+        var noMatchingTupleResponse = tupleReadResponse(List.of());
+        var existingTupleResponse = tupleReadResponse(List.of(existingTuple));
+        when(fgaClient.read(any(ClientReadRequest.class), any(ClientReadOptions.class)))
+                .thenReturn(
+                        CompletableFuture.completedFuture(noMatchingTupleResponse),
+                        CompletableFuture.completedFuture(existingTupleResponse));
+        when(fgaClient.write(any(), any(ClientWriteOptions.class)))
+                .thenReturn(CompletableFuture.completedFuture(mock(ClientWriteResponse.class)));
+
+        new OpenFgaInitializer(
+                        fgaClient,
+                        initialization("classpath:fga/model.json", "classpath:fga/tuples.json"),
+                        new DefaultResourceLoader())
+                .run(new DefaultApplicationArguments());
+
+        var modelCaptor = ArgumentCaptor.forClass(WriteAuthorizationModelRequest.class);
+        verify(fgaClient).writeAuthorizationModel(modelCaptor.capture());
+        assertEquals("1.1", modelCaptor.getValue().getSchemaVersion());
+        assertEquals(2, modelCaptor.getValue().getTypeDefinitions().size());
+        assertEquals(1, modelCaptor.getValue().getConditions().size());
+
+        var requestCaptor = ArgumentCaptor.forClass(ClientWriteRequest.class);
+        verify(fgaClient).write(requestCaptor.capture(), any(ClientWriteOptions.class));
+        var write = requestCaptor.getValue().getWrites().get(0);
+        assertEquals("document:1", write.getObject());
+        assertEquals("non_expired_grant", write.getCondition().getName());
+        assertEquals(
+                Map.of("grant_time", "2023-01-01T00:00:00Z", "grant_duration", "1h"),
+                write.getCondition().getContext());
+        assertEquals("document:2", requestCaptor.getValue().getDeletes().get(0).getObject());
+    }
+
+    @Test
     void writesTupleWithCondition() throws Exception {
         stubLatestModel(new AuthorizationModel().id("01H..."));
         stubResource("classpath:fga/tuples.json", """
@@ -230,19 +272,25 @@ class OpenFgaInitializerTest {
         return Stream.of(
                 Arguments.of("""
                         {"write": [{"user": "user:123", "relation": "reader", "object": "document:1"}]}
-                        """, "Unknown property in OpenFGA initial tuples: write"),
-                Arguments.of("""
-                        {"writes": [{"user": "user:123", "relation": "reader", "object": "document:1",
-                                     "conditon": {"name": "non_expired_grant"}}]}
-                        """, "Unknown property in OpenFGA initial tuple write: conditon"),
+                        """, "Unknown property 'write' in OpenFGA initial tuples"),
+                Arguments.of(
+                        """
+                        {"writes": [{"conditon": {"name": "non_expired_grant"},
+                                     "user": "user:123", "relation": "reader", "object": "document:1"}]}
+                        """,
+                        "Unknown property 'conditon' in OpenFGA initial tuple write"
+                                + " user=user:123, relation=reader, object=document:1"),
                 Arguments.of("""
                         {"writes": [{"user": "user:123", "relation": "reader", "object": "document:1",
                                      "condition": {"name": "non_expired_grant", "contxt": {}}}]}
-                        """, "Unknown property in OpenFGA initial tuple condition: contxt"),
-                Arguments.of("""
+                        """, "Unknown property 'contxt' in OpenFGA initial tuple condition"),
+                Arguments.of(
+                        """
                         {"deletes": [{"user": "user:123", "relation": "reader", "object": "document:2",
                                       "condition": {"name": "non_expired_grant"}}]}
-                        """, "Unknown property in OpenFGA initial tuple delete: condition"));
+                        """,
+                        "Unknown property 'condition' in OpenFGA initial tuple delete"
+                                + " user=user:123, relation=reader, object=document:2"));
     }
 
     @Test

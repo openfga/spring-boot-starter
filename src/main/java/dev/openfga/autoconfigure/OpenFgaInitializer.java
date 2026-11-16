@@ -218,7 +218,7 @@ public class OpenFgaInitializer implements ApplicationRunner {
     record InitialTuples(List<InitialTupleKey> writes, List<InitialTupleKeyWithoutCondition> deletes) {
         @JsonAnySetter
         void rejectUnknownProperty(String name, Object value) {
-            throw new IllegalArgumentException("Unknown property in OpenFGA initial tuples: " + name);
+            throw new IllegalArgumentException("Unknown property '" + name + "' in OpenFGA initial tuples");
         }
 
         ClientWriteRequest toClientWriteRequest() {
@@ -272,7 +272,8 @@ public class OpenFgaInitializer implements ApplicationRunner {
     record InitialTupleKey(String user, String relation, String object, InitialCondition condition) {
         @JsonAnySetter
         void rejectUnknownProperty(String name, Object value) {
-            throw new IllegalArgumentException("Unknown property in OpenFGA initial tuple write: " + name);
+            throw new IllegalArgumentException("Unknown property '" + name + "' in OpenFGA initial tuple write "
+                    + formatTuple(user, relation, object));
         }
 
         ClientTupleKey toClientTupleKey() {
@@ -299,7 +300,8 @@ public class OpenFgaInitializer implements ApplicationRunner {
     record InitialTupleKeyWithoutCondition(String user, String relation, String object) {
         @JsonAnySetter
         void rejectUnknownProperty(String name, Object value) {
-            throw new IllegalArgumentException("Unknown property in OpenFGA initial tuple delete: " + name);
+            throw new IllegalArgumentException("Unknown property '" + name + "' in OpenFGA initial tuple delete "
+                    + formatTuple(user, relation, object));
         }
 
         ClientTupleKeyWithoutCondition toClientTupleKeyWithoutCondition() {
@@ -316,7 +318,7 @@ public class OpenFgaInitializer implements ApplicationRunner {
     record InitialCondition(String name, Map<String, Object> context) {
         @JsonAnySetter
         void rejectUnknownProperty(String name, Object value) {
-            throw new IllegalArgumentException("Unknown property in OpenFGA initial tuple condition: " + name);
+            throw new IllegalArgumentException("Unknown property '" + name + "' in OpenFGA initial tuple condition");
         }
     }
 }
