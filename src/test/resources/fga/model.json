@@ -17,11 +17,32 @@
             "directly_related_user_types": [
               {
                 "type": "user"
+              },
+              {
+                "type": "user",
+                "condition": "non_expired_grant"
               }
             ]
           }
         }
       }
     }
-  ]
+  ],
+  "conditions": {
+    "non_expired_grant": {
+      "name": "non_expired_grant",
+      "expression": "current_time < grant_time + grant_duration",
+      "parameters": {
+        "current_time": {
+          "type_name": "TYPE_NAME_TIMESTAMP"
+        },
+        "grant_time": {
+          "type_name": "TYPE_NAME_TIMESTAMP"
+        },
+        "grant_duration": {
+          "type_name": "TYPE_NAME_DURATION"
+        }
+      }
+    }
+  }
 }

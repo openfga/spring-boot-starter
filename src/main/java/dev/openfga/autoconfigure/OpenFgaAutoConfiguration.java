@@ -166,9 +166,7 @@ public class OpenFgaAutoConfiguration {
         var httpClientBuilder = httpClientBuilderProvider.getIfAvailable(HttpClient::newBuilder);
         httpClientBuilderCustomizer.customize(httpClientBuilder);
 
-        return new ApiClient(
-                httpClientBuilder,
-                jsonSerializerProvider.getIfAvailable(JsonSerializerFactory::createDefaultJsonSerializer));
+        return new ApiClient(httpClientBuilder, jsonSerializerProvider.getIfAvailable(JsonSerializer::createDefault));
     }
 
     /**

@@ -5,9 +5,10 @@
       "relation": "reader",
       "object": "document:1",
       "condition": {
-        "name": "is_valid",
+        "name": "non_expired_grant",
         "context": {
-          "key": "value"
+          "grant_time": "2023-01-01T00:00:00Z",
+          "grant_duration": "1h"
         }
       }
     }
