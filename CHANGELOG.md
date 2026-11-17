@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/openfga/spring-boot-starter/compare/v0.5.0...v0.5.1) (2026-11-17)
+
+
+### Security
+
+* bump openfga-sdk to 0.11.2 to resolve [GHSA-c949-2vhm-4ghg](https://github.com/openfga/java-sdk/security/advisories/GHSA-c949-2vhm-4ghg) ([#217](https://github.com/openfga/spring-boot-starter/issues/217)) ([b11503f](https://github.com/openfga/spring-boot-starter/commit/b11503fdabb56fefd5ccf567db89bdfc6ca3ebd4))
+
 ## [0.5.0](https://github.com/openfga/spring-boot-starter/compare/v0.4.1...v0.5.0) (2026-11-13)
 
 
